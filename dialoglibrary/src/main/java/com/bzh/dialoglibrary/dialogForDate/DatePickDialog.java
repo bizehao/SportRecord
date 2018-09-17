@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import com.djts.datalibrary.bean.DateType;
+import com.bzh.dialoglibrary.R;
+import com.bzh.dialoglibrary.dialogForDate.bean.DateType;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

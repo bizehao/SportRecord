@@ -1,7 +1,8 @@
 package com.bzh.dialoglibrary.dialogForDate.listener;
 
-import com.djts.datalibrary.bean.DateBean;
-import com.djts.datalibrary.bean.DateType;
+import com.bzh.dialoglibrary.dialogForDate.bean.DateBean;
+import com.bzh.dialoglibrary.dialogForDate.bean.DateType;
+
 
 /**
  * Created by codbking on 2016/9/22.

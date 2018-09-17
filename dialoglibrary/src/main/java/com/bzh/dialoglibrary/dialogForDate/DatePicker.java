@@ -2,11 +2,10 @@ package com.bzh.dialoglibrary.dialogForDate;
 
 import android.content.Context;
 import android.widget.TextView;
-
-import com.djts.datalibrary.bean.DateType;
-import com.djts.datalibrary.genview.WheelGeneralAdapter;
-import com.djts.datalibrary.view.WheelView;
-
+import com.bzh.dialoglibrary.R;
+import com.bzh.dialoglibrary.dialogForDate.bean.DateType;
+import com.bzh.dialoglibrary.dialogForDate.genview.WheelGeneralAdapter;
+import com.bzh.dialoglibrary.dialogForDate.view.WheelView;
 import java.util.Date;
 
 /**

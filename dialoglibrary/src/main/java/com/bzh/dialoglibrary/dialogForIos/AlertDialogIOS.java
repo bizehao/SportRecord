@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bzh.dialoglibrary.R;
+
 public class AlertDialogIOS {
     private Context context;
     private Dialog dialog;

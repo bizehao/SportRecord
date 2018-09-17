@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_login"
+            android:icon="@mipmap/nav_menu_login"
+            android:title="登录" />
+
+        <item
+            android:id="@+id/nav_loginout"
+            android:icon="@mipmap/nav_menu_login_out"
+            android:title="注销登录" />
+
+        <item
+            android:id="@+id/nav_nocturnal_pattern"
+            android:icon="@mipmap/nav_menu_nocturnal_pattern"
+            android:title="夜间模式" />
+
+        <item
+            android:id="@+id/nav_feedback_feedback"
+            android:icon="@mipmap/nav_menu_feedback_feedback"
+            android:title="意见反馈" />
+
+        <item
+            android:id="@+id/nav_adout_me"
+            android:icon="@mipmap/nav_menu_adout_me"
+            android:title="关于我们" />
+
+        <item
+            android:id="@+id/nav_setup"
+            android:icon="@mipmap/nav_menu_set_up"
+            android:title="设置" />
+
+        <item
+            android:id="@+id/nav_sign_out"
+            android:icon="@mipmap/nav_menu_sign_out"
+            android:title="退出程序" />
+
+    </group>
+</menu>

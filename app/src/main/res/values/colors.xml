@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimary">#353333</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#e1940f</color>
+    <color name="blue">#177ed3</color>
+    <color name="red">#ff0000</color>
+    <color name="green">#08f246</color>
+    <color name="button_up">#37dd63</color>
+    <color name="button_down">#29b74f</color>
+    <color name="tran_green">#b41a8fe8</color>
+    <color name="black">#262222</color>
+    <color name="white">#ffffff</color>
+    <color name="transparent">#00000000</color>
+    <color name="tab_checked">#ED6A2C</color><!-- 选中-->
+    <color name="tab_unchecked">#757575</color><!-- 未选中 -->
 </resources>

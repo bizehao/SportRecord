@@ -19,7 +19,7 @@ package com.bzh.dialoglibrary.dialogForDate.adapters;
 
 import android.content.Context;
 
-import com.djts.datalibrary.view.WheelAdapter;
+import com.bzh.dialoglibrary.dialogForDate.view.WheelAdapter;
 
 
 /**
