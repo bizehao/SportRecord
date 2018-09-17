@@ -15,14 +15,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RetrofitHelper {
 
-    private Context mContext;
-
     private Retrofit mRetrofit = null;
 
     private static RetrofitHelper instance = null;
 
-    private RetrofitHelper(Context mContext) {
-        mContext = mContext;
+    private RetrofitHelper() {
         init();
     }
 
@@ -30,9 +27,9 @@ public class RetrofitHelper {
 
     private static final GsonConverterFactory gsonFactory = GsonConverterFactory.create(new GsonBuilder().create());
 
-    public static RetrofitHelper getInstance(Context context) {
+    public static RetrofitHelper getInstance() {
         if (instance == null) {
-            instance = new RetrofitHelper(context);
+            instance = new RetrofitHelper();
         }
         return instance;
     }
@@ -43,7 +40,7 @@ public class RetrofitHelper {
 
     private void resetApp(){
         mRetrofit = new Retrofit.Builder()
-                .baseUrl("https://api.douban.com/v2/")
+                .baseUrl("http://192.168.1.200:8090/")
                 .client(client)
                 .addConverterFactory(gsonFactory)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
