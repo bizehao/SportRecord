@@ -17,9 +17,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.activity.BaseActivity;
@@ -30,8 +32,11 @@ import com.bzh.sportrecord.module.login.LoginActivity;
 
 import java.time.Instant;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeActivity extends BaseActivity<HomePresenter> implements HomeContract.View {
 
@@ -50,6 +55,18 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @BindView(R.id.home_bottom_bar)
     BottomNavigationBar mBottomNavigationBar;
 
+    /*@BindView(R.id.user_icon)
+    CircleImageView mCircleImageView;*/
+
+    /*@BindView(R.id.user_name)
+    TextView mTextViewName;*/
+
+    /*@BindView(R.id.user_motto)
+    TextView mTextViewMotto;*/
+
+    @Inject
+    HomePresenter mPresenter;
+
     private Fragment[] fragments = new Fragment[3];
     private int[] colors = new int[3];
 
@@ -60,7 +77,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     protected void inject() {
-        //super.activityComponent.inject(this);
+        activityComponent.inject(this);
     }
 
     @Override
@@ -85,14 +102,16 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
         if (App.loginSign) {
             mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
-        }else {
+            //加载用户信息
+            mPresenter.loadData(App.id);
+        } else {
             mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
         }
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.nav_login:
                         showToast("登录");
                         Intent instant = new Intent(HomeActivity.this, LoginActivity.class);
@@ -144,9 +163,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
                         fragmentTransaction.hide(nowFragment).add(R.id.ttest, nextFragment);
                     }
                     fragmentTransaction.commitAllowingStateLoss();
-
                 }
-
             }
 
             @Override
@@ -168,31 +185,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
             public void onTabReselected(int position) {
             }
         });
-    }
-
-    @Override
-    public void showErrorMsg(String errorMsg) {
-
-    }
-
-    @Override
-    public void showNormal() {
-
-    }
-
-    @Override
-    public void showError() {
-
-    }
-
-    @Override
-    public void showLoading() {
-
-    }
-
-    @Override
-    public void shutDownLoading() {
-
     }
 
     @Override
@@ -226,5 +218,21 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
                         showToast("点击了");
                     }
                 }).show();*/
+    }
+
+    @Override
+    public void setHeadPortrait(int image) {
+        //ContextCompat.getDrawable(getApplication(),R.drawable.user_icon);
+        //Glide.with(this).load(getDrawable(image)).into(mCircleImageView);
+    }
+
+    @Override
+    public void setHeadName(String name) {
+        //mTextViewName.setText(name);
+    }
+
+    @Override
+    public void setHeadMotto(String motto) {
+        //mTextViewMotto.setText(motto);
     }
 }

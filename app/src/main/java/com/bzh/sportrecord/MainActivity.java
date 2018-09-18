@@ -1,15 +1,9 @@
 package com.bzh.sportrecord;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-
 import com.bzh.sportrecord.base.activity.BaseActivity;
-import com.bzh.sportrecord.di.component.ActivityComponent;
-import com.bzh.sportrecord.di.module.ActivityModule;
 import com.bzh.sportrecord.module.home.HomeActivity;
-import com.bzh.sportrecord.test.Person;
 
 import javax.inject.Inject;
 

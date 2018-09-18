@@ -6,43 +6,34 @@ import com.bzh.sportrecord.base.view.BaseView;
 public interface HomeContract {
 
     interface View extends BaseView {
+        /**
+         * 设置头像
+         *
+         * @param image
+         */
+        void setHeadPortrait(int image);
 
+        /**
+         * 设置名称
+         *
+         * @param name
+         */
+        void setHeadName(String name);
+
+        /**
+         * 设置格言
+         *
+         * @param motto
+         */
+        void setHeadMotto(String motto);
     }
 
     interface Presenter extends BasePresenter<View> {
-        /**
-         * 设置登录状态
-         *
-         * @param loginStatus login status
-         */
-        void setLoginStatus(boolean loginStatus);
 
         /**
-         * 获取登录状态
-         *
-         * @return if is login status
+         * 加载数据
+         * @param id
          */
-        boolean getLoginStatus();
-
-        /**
-         * 获取账号
-         *
-         * @return login account
-         */
-        String getLoginAccount();
-
-        /**
-         * 设置登录账号
-         *
-         * @param account account
-         */
-        void setLoginAccount(String account);
-
-        /**
-         * 设置登录密码
-         *
-         * @param password password
-         */
-        void setLoginPassword(String password);
+        void loadData(String id);
     }
 }

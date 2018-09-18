@@ -1,31 +1,26 @@
 package com.bzh.sportrecord.module.home;
 
+import android.content.Context;
+
+import com.bzh.sportrecord.api.DataManager;
+import com.bzh.sportrecord.model.ApiUserInfo;
+import com.bzh.sportrecord.module.login.loginInLogin.LoginContract;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class HomePresenter implements HomeContract.Presenter {
-    @Override
-    public void setLoginStatus(boolean loginStatus) {
 
-    }
+    private Context mContext;
 
-    @Override
-    public boolean getLoginStatus() {
-        return false;
-    }
+    private HomeContract.View mView;
 
-    @Override
-    public String getLoginAccount() {
-        return null;
-    }
-
-    @Override
-    public void setLoginAccount(String account) {
-
-    }
-
-    @Override
-    public void setLoginPassword(String password) {
-
+    public HomePresenter(Context context, HomeContract.View view) {
+        this.mContext = context;
+        this.mView = view;
     }
 
     @Override
@@ -46,5 +41,18 @@ public class HomePresenter implements HomeContract.Presenter {
     @Override
     public int getCurrentPage() {
         return 0;
+    }
+
+    @Override
+    public void loadData(String id) {
+        /*DataManager dataManager = DataManager.getInstance();
+        Observable<ApiUserInfo> observable =  dataManager.getUserInfo(id);
+        observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(apiUserInfo -> {
+
+                }, throwable -> {
+
+                });*/
     }
 }

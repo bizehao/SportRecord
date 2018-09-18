@@ -5,7 +5,12 @@ import android.content.Context;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
+
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -23,7 +28,8 @@ public class RetrofitHelper {
         init();
     }
 
-    private static final OkHttpClient client = new OkHttpClient();
+    //添加动态head
+    private static final OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new RequestInterceptor()).build();
 
     private static final GsonConverterFactory gsonFactory = GsonConverterFactory.create(new GsonBuilder().create());
 
@@ -34,11 +40,11 @@ public class RetrofitHelper {
         return instance;
     }
 
-    private void init(){
+    private void init() {
         resetApp();
     }
 
-    private void resetApp(){
+    private void resetApp() {
         mRetrofit = new Retrofit.Builder()
                 .baseUrl("http://192.168.1.200:8090/")
                 .client(client)
@@ -47,7 +53,29 @@ public class RetrofitHelper {
                 .build();
     }
 
-    public RetrofitService getServer(){
+    public RetrofitService getServer() {
         return mRetrofit.create(RetrofitService.class);
+    }
+
+    //动态head
+    public static class RequestInterceptor implements Interceptor {
+
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Request original = chain.request();
+            Request request;;
+            if (DataManager.headValue == null) {
+                request = original.newBuilder()
+                        .method(original.method(), original.body())
+                        .build();
+            } else {
+                request = original.newBuilder()
+                        .header("X_Auth_Token", DataManager.headValue)
+                        //.header("Accept", "application/vnd.yourapi.v1.full+json")
+                        .method(original.method(), original.body())
+                        .build();
+            }
+            return chain.proceed(request);
+        }
     }
 }

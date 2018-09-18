@@ -40,9 +40,6 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
 
     protected ActivityComponent activityComponent;
 
-    /*@Inject
-    protected T mPresenter;*/
-
     protected Unbinder unBinder;
 
     /**
@@ -58,7 +55,6 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
         super.onCreate(savedInstanceState);
         initSystemBarTint(); //状态栏
         beforeInit(); //初始化之前
-        System.out.println("[[[[[[[[[[[]]]]]]]]]]]]");
         if (getContentViewLayoutID() != 0) {
             setContentView(getContentViewLayoutID());
             initView(savedInstanceState); //初始化
@@ -70,9 +66,10 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
         unBinder = ButterKnife.bind(this); //设置 ButterKnife
-        /*activityComponent = DaggerActivityComponent.builder()
+        activityComponent = DaggerActivityComponent.builder()
                 .appComponent(App.appComponent)
-                .build();*/
+                .activityModule(new ActivityModule(this,this))
+                .build();
         inject();
     }
 
@@ -170,5 +167,30 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
             mToast.setText(desc);
         }
         mToast.show();
+    }
+
+    @Override
+    public void showErrorMsg(String errorMsg) {
+
+    }
+
+    @Override
+    public void showNormal() {
+
+    }
+
+    @Override
+    public void showError() {
+
+    }
+
+    @Override
+    public void showLoading() {
+
+    }
+
+    @Override
+    public void shutDownLoading() {
+
     }
 }

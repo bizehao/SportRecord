@@ -28,12 +28,6 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment imp
 
     protected FragmentComponent fragmentComponent;
 
-    @Inject
-    protected T mPresenter;
-
-    /*@Inject
-    protected T mPresenter;*/
-
     /**
      * 获取布局ID
      */

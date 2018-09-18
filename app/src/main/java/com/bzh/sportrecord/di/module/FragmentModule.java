@@ -27,7 +27,7 @@ public class FragmentModule {
     }
 
     @Provides
-    LoginPresenter providesBasePresenter(){
+    LoginPresenter providesLoginPresenter(){
         return new LoginPresenter(context, (LoginContract.View) baseView);
     }
 }
