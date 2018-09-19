@@ -45,14 +45,14 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void loadData(String id) {
-        /*DataManager dataManager = DataManager.getInstance();
+        DataManager dataManager = DataManager.getInstance();
         Observable<ApiUserInfo> observable =  dataManager.getUserInfo(id);
-        observable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(apiUserInfo -> {
-
-                }, throwable -> {
-
-                });*/
+        dataManager.successHandler(observable, new DataManager.callBack() {
+            @Override
+            public <T> void run(T t) {
+                ApiUserInfo apiUserInfo = (ApiUserInfo) t;
+                System.out.println(apiUserInfo);
+            }
+        });
     }
 }

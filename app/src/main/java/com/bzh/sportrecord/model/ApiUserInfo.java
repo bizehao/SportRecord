@@ -93,5 +93,25 @@ public class ApiUserInfo {
         public void setMotto(String motto) {
             this.motto = motto;
         }
+
+        @Override
+        public String toString() {
+            return "DataBean{" +
+                    "name='" + name + '\'' +
+                    ", headportrait='" + headportrait + '\'' +
+                    ", descript='" + descript + '\'' +
+                    ", address='" + address + '\'' +
+                    ", motto='" + motto + '\'' +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "ApiUserInfo{" +
+                "code='" + code + '\'' +
+                ", data=" + data +
+                ", message='" + message + '\'' +
+                '}';
     }
 }

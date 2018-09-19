@@ -27,6 +27,6 @@ public interface RetrofitService {
                                @Field("password") String password);
     //获取用户信息
     @GET("user/get-user-info")
-    Observable<ApiUserInfo> getUserInfo(String id);
+    Observable<ApiUserInfo> getUserInfo(@Query("id")String id);
 
 }
