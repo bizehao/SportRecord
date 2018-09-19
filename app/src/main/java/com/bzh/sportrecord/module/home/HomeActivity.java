@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -24,6 +25,7 @@ import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
+import com.bzh.sportrecord.api.DataManager;
 import com.bzh.sportrecord.base.activity.BaseActivity;
 import com.bzh.sportrecord.module.home.homeNews.NewsFragment;
 import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
@@ -55,14 +57,11 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @BindView(R.id.home_bottom_bar)
     BottomNavigationBar mBottomNavigationBar;
 
-    /*@BindView(R.id.user_icon)
-    CircleImageView mCircleImageView;*/
+    CircleImageView mCircleImageView;
 
-    /*@BindView(R.id.user_name)
-    TextView mTextViewName;*/
+    TextView mTextViewName;
 
-    /*@BindView(R.id.user_motto)
-    TextView mTextViewMotto;*/
+    TextView mTextViewMotto;
 
     @Inject
     HomePresenter mPresenter;
@@ -84,8 +83,10 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     protected void initView(Bundle savedInstanceState) {
         System.out.println("初始化view成功");
         setSupportActionBar(mToolbar);
-        //mDrawerLayout.setFitsSystemWindows(true);
-        //toolbar.setFitsSystemWindows(true);
+        View navigationHeadView = mNavigationView.getHeaderView(0);
+        mCircleImageView = navigationHeadView.findViewById(R.id.user_icon);
+        mTextViewName = navigationHeadView.findViewById(R.id.user_name);
+        mTextViewMotto = navigationHeadView.findViewById(R.id.user_motto);
         if (mToolbar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(R.mipmap.menu_carte);
@@ -99,26 +100,23 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
         //侧滑菜单 menu
         //mNavigationView.setCheckedItem(R.id.nav_login);
-        if (App.loginSign) {
-            mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-            mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
-            //加载用户信息
-            mPresenter.loadData(App.id);
-        } else {
-            mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
-            mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
-        }
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                Intent instant;
                 switch (menuItem.getItemId()) {
                     case R.id.nav_login:
                         showToast("登录");
-                        Intent instant = new Intent(HomeActivity.this, LoginActivity.class);
+                        instant = new Intent(HomeActivity.this, LoginActivity.class);
                         startActivity(instant);
                         break;
                     case R.id.nav_loginout:
                         showToast("注销");
+                        App.loginSign = false;
+                        App.id = null;
+                        DataManager.getInstance().setHeadValue(null);
+                        instant = new Intent(HomeActivity.this, LoginActivity.class);
+                        startActivity(instant);
                         break;
                     case R.id.nav_nocturnal_pattern:
                         showToast("夜间模式");
@@ -188,6 +186,30 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        System.out.println("走了onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("走了onResume");
+        if (App.loginSign) {
+            mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+            mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
+            //加载用户信息
+            mPresenter.loadData(App.id);
+        } else {
+            mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+            mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
+            Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.mipmap.no_login_user)).into(mCircleImageView);
+            mTextViewName.setText("未登录");
+            mTextViewMotto.setText("");
+        }
+    }
+
+    @Override
     protected boolean translucentStatusBar() { //透明状态栏
         return true;
     }
@@ -222,17 +244,16 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
 
     @Override
     public void setHeadPortrait(int image) {
-        //ContextCompat.getDrawable(getApplication(),R.drawable.user_icon);
-        //Glide.with(this).load(getDrawable(image)).into(mCircleImageView);
+        Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.drawable.user_icon)).into(mCircleImageView);
     }
 
     @Override
     public void setHeadName(String name) {
-        //mTextViewName.setText(name);
+        mTextViewName.setText(name);
     }
 
     @Override
     public void setHeadMotto(String motto) {
-        //mTextViewMotto.setText(motto);
+        mTextViewMotto.setText(motto);
     }
 }

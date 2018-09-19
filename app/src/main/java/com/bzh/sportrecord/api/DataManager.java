@@ -47,6 +47,7 @@ public class DataManager implements RetrofitService {
                 .subscribe(t -> {
                     callBack.run(t);
                 }, throwable -> {
+                    System.out.println("网络请求发生错误");
                     throwable.getMessage();
                 });
     }

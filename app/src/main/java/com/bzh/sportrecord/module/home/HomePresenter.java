@@ -52,6 +52,9 @@ public class HomePresenter implements HomeContract.Presenter {
             public <T> void run(T t) {
                 ApiUserInfo apiUserInfo = (ApiUserInfo) t;
                 System.out.println(apiUserInfo);
+                mView.setHeadPortrait(1); //头像 暂未处理
+                mView.setHeadName(apiUserInfo.getData().getName());
+                mView.setHeadMotto(apiUserInfo.getData().getMotto());
             }
         });
     }

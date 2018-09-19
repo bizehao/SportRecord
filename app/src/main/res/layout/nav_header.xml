@@ -10,15 +10,16 @@
         android:id="@+id/user_icon"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:src="@drawable/user_icon"
+        android:src="@mipmap/no_login_user"
         android:layout_centerInParent="true"/>
 
     <TextView
         android:id="@+id/user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="212214111@qq.com"
+        android:layout_above="@id/user_motto"
+        android:layout_marginBottom="5dp"
+        android:text="未登录"
         android:textColor="#fff"
         android:textSize="14sp" />
 
@@ -26,8 +27,8 @@
         android:id="@+id/user_motto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/user_name"
-        android:text="张三风"
+        android:layout_alignParentBottom="true"
+        android:text=""
         android:textColor="#fff"
         android:textSize="14sp" />
 
