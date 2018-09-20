@@ -47,6 +47,8 @@ public class ApiLogin {
 
         private String X_Auth_Token;
 
+        private String username;
+
         public String getX_Auth_Token() {
             return X_Auth_Token;
         }
@@ -55,10 +57,19 @@ public class ApiLogin {
             this.X_Auth_Token = X_Auth_Token;
         }
 
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
         @Override
         public String toString() {
             return "DataBean{" +
                     "X_Auth_Token='" + X_Auth_Token + '\'' +
+                    ", username='" + username + '\'' +
                     '}';
         }
     }

@@ -32,8 +32,8 @@ public interface HomeContract {
 
         /**
          * 加载数据
-         * @param id
+         * @param username
          */
-        void loadData(String id);
+        void loadData(String username);
     }
 }

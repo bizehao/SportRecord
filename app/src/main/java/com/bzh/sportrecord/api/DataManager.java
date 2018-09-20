@@ -24,14 +24,8 @@ public class DataManager implements RetrofitService {
 
     private RetrofitService mRetrofitService;
 
-    protected static String headValue;
-
     private DataManager() {
         this.mRetrofitService = RetrofitHelper.getInstance().getServer();
-    }
-
-    public void setHeadValue(String headValue) {
-        DataManager.headValue = headValue;
     }
 
     public static DataManager getInstance() {
@@ -63,13 +57,12 @@ public class DataManager implements RetrofitService {
 
     @Override
     public Observable<ApiLogin> login(String username, String password) {
-        this.setHeadValue(null);
         return mRetrofitService.login(username, password);
     }
 
     @Override
-    public Observable<ApiUserInfo> getUserInfo(String id) {
-        return mRetrofitService.getUserInfo(id);
+    public Observable<ApiUserInfo> getUserInfo(String username) {
+        return mRetrofitService.getUserInfo(username);
     }
 
 

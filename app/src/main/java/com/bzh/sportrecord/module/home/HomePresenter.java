@@ -1,18 +1,15 @@
 package com.bzh.sportrecord.module.home;
 
 import android.content.Context;
-
+import android.util.Log;
 import com.bzh.sportrecord.api.DataManager;
 import com.bzh.sportrecord.model.ApiUserInfo;
-import com.bzh.sportrecord.module.login.loginInLogin.LoginContract;
-
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 public class HomePresenter implements HomeContract.Presenter {
+
+    private static final String TAG = "HomePresenter";
 
     private Context mContext;
 
@@ -44,9 +41,10 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     @Override
-    public void loadData(String id) {
+    public void loadData(String username) {
+        Log.d(TAG, "loadData: "+username);
         DataManager dataManager = DataManager.getInstance();
-        Observable<ApiUserInfo> observable =  dataManager.getUserInfo(id);
+        Observable<ApiUserInfo> observable =  dataManager.getUserInfo(username);
         dataManager.successHandler(observable, new DataManager.callBack() {
             @Override
             public <T> void run(T t) {

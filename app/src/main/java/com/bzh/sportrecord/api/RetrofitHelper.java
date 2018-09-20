@@ -2,6 +2,7 @@ package com.bzh.sportrecord.api;
 
 import android.content.Context;
 
+import com.bzh.sportrecord.App;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -64,14 +65,14 @@ public class RetrofitHelper {
         public Response intercept(Chain chain) throws IOException {
             Request original = chain.request();
             Request request;;
-            if (DataManager.headValue == null) {
+            if (App.getLoginSign()) {
                 request = original.newBuilder()
+                        .header("X_Auth_Token", App.getToken())
+                        //.header("Accept", "application/vnd.yourapi.v1.full+json")
                         .method(original.method(), original.body())
                         .build();
             } else {
                 request = original.newBuilder()
-                        .header("X_Auth_Token", DataManager.headValue)
-                        //.header("Accept", "application/vnd.yourapi.v1.full+json")
                         .method(original.method(), original.body())
                         .build();
             }

@@ -112,9 +112,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
                         break;
                     case R.id.nav_loginout:
                         showToast("注销");
-                        App.loginSign = false;
-                        App.id = null;
-                        DataManager.getInstance().setHeadValue(null);
+                        App.setLoginSign(false);
                         instant = new Intent(HomeActivity.this, LoginActivity.class);
                         startActivity(instant);
                         break;
@@ -195,11 +193,11 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     protected void onResume() {
         super.onResume();
         System.out.println("走了onResume");
-        if (App.loginSign) {
+        if (App.getLoginSign()) {
             mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
             //加载用户信息
-            mPresenter.loadData(App.id);
+            mPresenter.loadData(App.getUsername());
         } else {
             mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
             mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
