@@ -1,5 +1,6 @@
 package com.bzh.sportrecord.di.component;
 
+import com.bzh.sportrecord.base.fragment.BaseFragment;
 import com.bzh.sportrecord.di.module.ActivityModule;
 import com.bzh.sportrecord.di.module.FragmentModule;
 import com.bzh.sportrecord.module.home.HomeActivity;
@@ -15,5 +16,5 @@ import dagger.Component;
 @Component(modules = {FragmentModule.class})
 public interface FragmentComponent {
 
-    void inject(LoginFragment loginFragment);
+    void inject(BaseFragment baseFragment);
 }

@@ -40,7 +40,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class HomeActivity extends BaseActivity<HomePresenter> implements HomeContract.View {
+public class HomeActivity extends BaseActivity implements HomeContract.View {
 
     @BindView(R.id.home_toolbar)
     Toolbar mToolbar;
@@ -64,7 +64,7 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     TextView mTextViewMotto;
 
     @Inject
-    HomePresenter mPresenter;
+    HomeContract.Presenter mPresenter;
 
     private Fragment[] fragments = new Fragment[3];
     private int[] colors = new int[3];
@@ -72,11 +72,6 @@ public class HomeActivity extends BaseActivity<HomePresenter> implements HomeCon
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_home;
-    }
-
-    @Override
-    protected void inject() {
-        activityComponent.inject(this);
     }
 
     @Override

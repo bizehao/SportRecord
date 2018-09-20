@@ -20,7 +20,7 @@ public class ActivityModule {
     }
 
     @Provides
-    HomePresenter providesHomePresenter(){
+    HomeContract.Presenter providesHomePresenter(){
         return new HomePresenter(context, (HomeContract.View) baseView);
     }
 }

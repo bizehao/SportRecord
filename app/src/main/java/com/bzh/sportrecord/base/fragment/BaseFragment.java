@@ -20,7 +20,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public abstract class BaseFragment<T extends BasePresenter> extends Fragment implements BaseView {
+public abstract class BaseFragment extends Fragment implements BaseView {
 
     private Unbinder unbinder;
 
@@ -36,7 +36,7 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment imp
     /**
      * 界面初始化
      */
-    protected abstract void init();
+    protected abstract void initView();
 
     @Nullable
     @Override
@@ -56,13 +56,15 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment imp
                 .fragmentModule(new FragmentModule(getActivity(),this))
                 .build();
         inject();
-        init();
+        initView();
     }
 
     /**
      * 注入组件
      */
-    protected abstract void inject();
+    protected void inject(){
+        fragmentComponent.inject(this);
+    };
 
     @Override
     public void onDestroyView() {

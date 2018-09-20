@@ -8,6 +8,7 @@ import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.api.DataManager;
 import com.bzh.sportrecord.model.ApiLogin;
 import com.bzh.sportrecord.module.home.HomeActivity;
+import com.bzh.sportrecord.module.login.LoginActivity;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -74,6 +75,8 @@ public class LoginPresenter implements LoginContract.Presenter {
                 Intent intent = new Intent(mContext, HomeActivity.class);
                 mContext.startActivity(intent); //跳转到home页面
                 mView.shutDownLoading();
+                LoginActivity loginActivity = (LoginActivity) mContext;
+                loginActivity.finish();
             }
         });
     }

@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class LoginFragment extends BaseFragment<LoginPresenter> implements LoginContract.View {
+public class LoginFragment extends BaseFragment implements LoginContract.View {
 
     @BindView(R.id.rout_register)
     TextView mTextView;
@@ -41,7 +41,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
     AppCompatButton loginBut;
 
     @Inject
-    LoginPresenter loginPresenter;
+    LoginContract.Presenter mLoginPresenter;
 
     @Override
     protected int getContentViewLayoutID() {
@@ -49,13 +49,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
     }
 
     @Override
-    protected void init() {
-
-    }
-
-    @Override
-    protected void inject() {
-        fragmentComponent.inject(this);
+    protected void initView() {
     }
 
     @OnClick(R.id.rout_register) //跳转到注册
@@ -68,7 +62,7 @@ public class LoginFragment extends BaseFragment<LoginPresenter> implements Login
 
     @OnClick(R.id.login_but) //点击登录
     public void setmLoginButClick(View view){
-        loginPresenter.login();
+        mLoginPresenter.login();
     }
 
     @Override

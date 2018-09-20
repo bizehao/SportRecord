@@ -34,9 +34,8 @@ import butterknife.Unbinder;
 /**
  * 基础 activity
  *
- * @param <T>
  */
-public abstract class BaseActivity<T extends BasePresenter> extends AppCompatActivity implements BaseView {
+public abstract class BaseActivity extends AppCompatActivity implements BaseView {
 
     protected ActivityComponent activityComponent;
 
@@ -85,7 +84,9 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
     /**
      * 注入组件
      */
-    protected abstract void inject();
+    protected void inject(){
+        activityComponent.inject(this);
+    };
 
     /**
      * 界面初始化前期准备
