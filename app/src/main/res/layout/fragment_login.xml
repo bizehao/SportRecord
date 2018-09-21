@@ -33,6 +33,9 @@
             android:id="@+id/login_user_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:maxLines="1"
+            android:imeOptions="actionNext"
+            android:inputType="text"
             android:hint="用户名" />
     </android.support.design.widget.TextInputLayout>
 
@@ -47,6 +50,9 @@
             android:id="@+id/password_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:inputType="textPassword"
+            android:imeOptions="actionDone"
             android:hint="密码"/>
 
     </android.support.design.widget.TextInputLayout>
@@ -80,7 +86,27 @@
             android:layout_gravity="center_horizontal"
             android:textColor="@color/blue"
             android:text="立即注册"/>
+    </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="360dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="忘记密码?"/>
+
+        <TextView
+            android:id="@+id/rout_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/blue"
+            android:text="找回"/>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

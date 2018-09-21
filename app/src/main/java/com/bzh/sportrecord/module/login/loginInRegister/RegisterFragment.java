@@ -1,28 +1,20 @@
 package com.bzh.sportrecord.module.login.loginInRegister;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.fragment.BaseFragment;
-import com.bzh.sportrecord.module.login.loginInLogin.LoginContract;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginFragment;
-import com.bzh.sportrecord.utils.RegisterCheck;
+import com.bzh.sportrecord.utils.DensityUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,11 +24,11 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 public class RegisterFragment extends BaseFragment implements RegisterContract.View {
+
+    private static final String TAG = "RegisterFragment";
 
     @BindView(R.id.register_return)
     TextView mImageButton;
@@ -95,6 +87,10 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
     @Inject
     RegisterContract.Presenter mRegisterPresenter;
 
+    private boolean usernameSign = true,
+            passwordSign = true, againPasswordSign = true, emailSign = true, nameSign = true,
+            descriptSign = true, addressSign = true, mottoSign = true; //各个输入框的表示
+
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.fragment_register;
@@ -102,11 +98,19 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
 
     @Override
     protected void initView() {
-
+        usernameText.addTextChangedListener(new ClassOfTextWatcher(usernameText, username));
+        passwordText.addTextChangedListener(new ClassOfTextWatcher(passwordText, password));
+        againPasswordText.addTextChangedListener(new ClassOfTextWatcher(againPasswordText, againPassword));
+        emailText.addTextChangedListener(new ClassOfTextWatcher(emailText, email));
+        nameText.addTextChangedListener(new ClassOfTextWatcher(nameText, name));
+        descriptText.addTextChangedListener(new ClassOfTextWatcher(descriptText, descript));
+        addressText.addTextChangedListener(new ClassOfTextWatcher(addressText, address));
     }
 
     @OnClick(R.id.register_return)
     public void registerReturnClick(View view) {
+        FrameLayout frameLayout = getActivity().findViewById(R.id.login_fragment);
+        frameLayout.setPadding(0,0,0, DensityUtils.dp2px(getActivity(),90));
         LoginFragment loginFragment = new LoginFragment();
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -129,43 +133,183 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
 
     @OnClick(R.id.register_sign_up)
     public void signUp() {
-        username.setErrorEnabled(false);
-        password.setErrorEnabled(false);
-        againPassword.setErrorEnabled(false);
-        email.setErrorEnabled(false);
-        name.setErrorEnabled(false);
-        descript.setErrorEnabled(false);
-        address.setErrorEnabled(false);
-        motto.setErrorEnabled(false);
-        boolean a = new RegisterCheck(username, usernameText, "用户名").isNull().checkLength(6, 15).getCheck();
-        boolean b = new RegisterCheck(password, passwordText, "密码").isNull().checkLength(6, 15).getCheck();
-        boolean c = new RegisterCheck(againPassword, againPasswordText, "密码").isNull().checkLength(6, 15).passWordFit(passwordText.getText().toString()).getCheck();
-        boolean d = new RegisterCheck(email, emailText, "邮箱").isNull().emailFormat().getCheck();
-        boolean e = new RegisterCheck(name, nameText, "名称").special(0, 6).getCheck();
-        boolean f = new RegisterCheck(descript, descriptText, "描述").special(0, 200).getCheck();
-        boolean g = new RegisterCheck(address, addressText, "地址").special(0, 50).getCheck();
-        boolean h = new RegisterCheck(motto, mottoText, "个性签名").special(0, 50).getCheck();
-        if (a && b && c && d && e && f && g && h) {
+        if (usernameText.getText().length() == 0) {
+            usernameSign = false;
+            textLayoutshowError(username, "用户名不能为空");
+        }
+        if (passwordText.getText().length() == 0) {
+            passwordSign = false;
+            textLayoutshowError(password, "密码不能为空");
+        }
+        if (againPasswordText.getText().length() == 0) {
+            againPasswordSign = false;
+            textLayoutshowError(againPassword, "密码不能为空");
+        }
+        if (emailText.getText().length() == 0) {
+            emailSign = false;
+            textLayoutshowError(email, "邮箱地址不能为空");
+        } else {
+            String reg = "\\w+@(\\w+\\.){1,3}\\w+";
+            Pattern pattern = Pattern.compile(reg);
+            Matcher matcher = pattern.matcher(emailText.getText().toString());
+            if (!matcher.matches()) {
+                emailSign = false;
+                textLayoutshowError(email, "邮箱格式不正确");
+            }
+        }
+        if (usernameSign && passwordSign && againPasswordSign && emailSign && nameSign && descriptSign && addressSign && mottoSign) {
             showToast("验证通过");
         } else {
             showToast("验证失败");
         }
-        usernameText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+    }
+
+    private class ClassOfTextWatcher implements TextWatcher {
+
+        private TextInputEditText editText;
+        private TextInputLayout layout;
+
+        public ClassOfTextWatcher(View editText, View layout) {
+            if (editText instanceof TextInputEditText && layout instanceof TextInputLayout) {
+                this.editText = (TextInputEditText) editText;
+                this.layout = (TextInputLayout) layout;
+            } else {
+                throw new ClassCastException("view must be an instance Of TextView");
             }
+        }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            System.out.println("sdsdsdsdsdsd");
+        }
 
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            switch (editText.getId()) {
+                case R.id.register_username_text:
+                    if (s.length() == 0) {
+                        usernameSign = false;
+                        textLayoutshowError(layout, "用户名不能为空");
+                    } else if (s.length() < 6) {
+                        usernameSign = false;
+                        textLayoutshowError(layout, "用户名长度至少6位");
+                    } else if (s.length() > 15) {
+                        usernameSign = false;
+                        textLayoutshowError(layout, "用户名长度最多15位");
+                    } else {
+                        usernameSign = true;
+                        layout.setErrorEnabled(false);
+                    }
+                    break;
+                case R.id.register_password_text:
+                    if (s.length() == 0) {
+                        againPasswordSign = false;
+                        textLayoutshowError(layout, "密码不能为空");
+                    } else if (s.length() < 6) {
+                        againPasswordSign = false;
+                        textLayoutshowError(layout, "密码长度至少6位");
+                    } else if (s.length() > 15) {
+                        againPasswordSign = false;
+                        textLayoutshowError(layout, "密码长度最多15位");
+                    } else if (againPasswordText.getText().length() > 0) {
+                        if (editText.getText().toString().equals(againPasswordText.getText().toString())) {
+                            againPasswordSign = true;
+                            layout.setErrorEnabled(false);
+                        } else {
+                            againPasswordSign = false;
+                            textLayoutshowError(layout, "两次密码不一致");
+                        }
+                    } else {
+                        againPasswordSign = true;
+                        layout.setErrorEnabled(false);
+                    }
+                    break;
+                case R.id.register_again_password_text:
+                    if (s.length() == 0) {
+                        passwordSign = false;
+                        textLayoutshowError(layout, "密码不能为空");
+                    } else if (s.length() < 6) {
+                        passwordSign = false;
+                        textLayoutshowError(layout, "密码长度至少6位");
+                    } else if (s.length() > 15) {
+                        passwordSign = false;
+                        textLayoutshowError(layout, "密码长度最多15位");
+                    } else if (passwordText.getText().length() > 0) {
+                        if (editText.getText().toString().equals(passwordText.getText().toString())) {
+                            passwordSign = true;
+                            layout.setErrorEnabled(false);
+                        } else {
+                            passwordSign = false;
+                            textLayoutshowError(layout, "两次密码不一致");
+                        }
+                    } else {
+                        layout.setErrorEnabled(false);
+                    }
+                    break;
+                case R.id.register_email_text:
+                    if (s.length() == 0) {
+                        emailSign = false;
+                        textLayoutshowError(layout, "邮箱地址不能为空");
+                    } else {
+                        emailSign = true;
+                        layout.setErrorEnabled(false);
+                    }
+                    break;
+                case R.id.register_name_text:
+                    if (s.length() > 15) {
+                        nameSign = false;
+                        textLayoutshowError(layout, "签名长度最多为15位");
+                    } else {
+                        nameSign = true;
+                        layout.setErrorEnabled(false);
+                    }
+                    break;
+                case R.id.register_descript_text:
+                    if (s.length() > 200) {
+                        descriptSign = false;
+                        textLayoutshowError(layout, "签名长度最多200位");
+                    } else {
+                        descriptSign = true;
+                        layout.setErrorEnabled(false);
+                    }
+                    break;
+                case R.id.register_address_text:
+                    if (s.length() > 50) {
+                        addressSign = false;
+                        textLayoutshowError(layout, "地址最多为50位");
+                    } else {
+                        addressSign = true;
+                        layout.setErrorEnabled(false);
+                    }
+                    break;
+                case R.id.register_motto_text:
+                    if (s.length() > 50) {
+                        mottoSign = false;
+                        textLayoutshowError(layout, "个性最多为50位");
+                    } else {
+                        mottoSign = true;
+                        layout.setErrorEnabled(false);
+                    }
+                    break;
             }
+        }
+    }
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
+    /**
+     * 显示错误提示，并获取焦点
+     *
+     * @param textInputLayout
+     * @param error
+     */
+    private void textLayoutshowError(TextInputLayout textInputLayout, String error) {
+        textInputLayout.setError(error);
+        textInputLayout.getEditText().setFocusable(true);
+        textInputLayout.getEditText().setFocusableInTouchMode(true);
+        textInputLayout.getEditText().requestFocus();
     }
 }

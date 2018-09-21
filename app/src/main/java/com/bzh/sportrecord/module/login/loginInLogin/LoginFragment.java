@@ -11,6 +11,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +55,8 @@ public class LoginFragment extends BaseFragment implements LoginContract.View {
 
     @OnClick(R.id.rout_register) //跳转到注册
     public void setmTextViewClick(View view){
+        FrameLayout frameLayout = getActivity().findViewById(R.id.login_fragment);
+        frameLayout.setPadding(0,0,0,0);
         RegisterFragment registerFragment = new RegisterFragment();
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
