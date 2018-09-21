@@ -16,5 +16,7 @@ public interface RegisterContract {
 
     interface Presenter extends BasePresenter<RegisterContract.View>{
 
+        //注册操作
+        void register();
     }
 }

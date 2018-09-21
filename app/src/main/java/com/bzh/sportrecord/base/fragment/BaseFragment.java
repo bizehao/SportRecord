@@ -62,9 +62,7 @@ public abstract class BaseFragment extends Fragment implements BaseView {
     /**
      * 注入组件
      */
-    protected void inject(){
-        fragmentComponent.inject(this);
-    };
+    protected abstract void inject();
 
     @Override
     public void onDestroyView() {

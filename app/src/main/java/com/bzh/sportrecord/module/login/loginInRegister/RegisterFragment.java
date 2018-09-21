@@ -107,7 +107,12 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
         addressText.addTextChangedListener(new ClassOfTextWatcher(addressText, address));
     }
 
-    @OnClick(R.id.register_return)
+    @Override
+    protected void inject() {
+        fragmentComponent.inject(this);
+    }
+
+    @OnClick(R.id.register_return) //跳转到登录页面
     public void registerReturnClick(View view) {
         FrameLayout frameLayout = getActivity().findViewById(R.id.login_fragment);
         frameLayout.setPadding(0,0,0, DensityUtils.dp2px(getActivity(),90));
@@ -158,9 +163,7 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
             }
         }
         if (usernameSign && passwordSign && againPasswordSign && emailSign && nameSign && descriptSign && addressSign && mottoSign) {
-            showToast("验证通过");
-        } else {
-            showToast("验证失败");
+            mRegisterPresenter.register();
         }
 
     }

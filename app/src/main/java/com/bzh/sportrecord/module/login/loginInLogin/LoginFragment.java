@@ -49,6 +49,10 @@ public class LoginFragment extends BaseFragment implements LoginContract.View {
         return R.layout.fragment_login;
     }
 
+    protected void inject(){
+        fragmentComponent.inject(this);
+    }
+
     @Override
     protected void initView() {
     }

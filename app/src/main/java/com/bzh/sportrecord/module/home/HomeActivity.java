@@ -75,6 +75,11 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     }
 
     @Override
+    protected void inject() {
+        activityComponent.inject(this);
+    }
+
+    @Override
     protected void initView(Bundle savedInstanceState) {
         System.out.println("初始化view成功");
         setSupportActionBar(mToolbar);

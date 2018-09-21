@@ -6,6 +6,8 @@ import com.bzh.sportrecord.base.presenter.BasePresenter;
 import com.bzh.sportrecord.base.view.BaseView;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginContract;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginPresenter;
+import com.bzh.sportrecord.module.login.loginInRegister.RegisterContract;
+import com.bzh.sportrecord.module.login.loginInRegister.RegisterPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -29,5 +31,10 @@ public class FragmentModule {
     @Provides
     LoginContract.Presenter providesLoginPresenter(){
         return new LoginPresenter(context, (LoginContract.View) baseView);
+    }
+
+    @Provides
+    RegisterContract.Presenter providesRegisterPresenter(){
+        return new RegisterPresenter(context, (RegisterContract.View) baseView);
     }
 }

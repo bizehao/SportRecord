@@ -1,7 +1,10 @@
 package com.bzh.sportrecord.api;
 
 import com.bzh.sportrecord.model.ApiLogin;
+import com.bzh.sportrecord.model.ApiRegister;
 import com.bzh.sportrecord.model.ApiUserInfo;
+
+import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -53,6 +56,11 @@ public class DataManager implements RetrofitService {
     @Override
     public Observable<ApiUserInfo> getUserInfo(String username) {
         return mRetrofitService.getUserInfo(username);
+    }
+
+    @Override
+    public Observable<ApiRegister> register(Map<String, String> requestRegister) {
+        return mRetrofitService.register(requestRegister);
     }
 
 

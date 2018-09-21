@@ -84,9 +84,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     /**
      * 注入组件
      */
-    protected void inject(){
-        activityComponent.inject(this);
-    };
+    protected abstract void inject();
 
     /**
      * 界面初始化前期准备
