@@ -26,7 +26,6 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void inject() {
-
     }
 
     @Override

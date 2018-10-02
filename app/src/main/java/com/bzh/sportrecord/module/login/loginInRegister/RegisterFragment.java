@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.fragment.BaseFragment;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginFragment;
+import com.bzh.sportrecord.ui.CustomDiaFrag;
 import com.bzh.sportrecord.utils.DensityUtils;
 
 import java.util.HashMap;
@@ -115,7 +116,7 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
     @OnClick(R.id.register_return) //跳转到登录页面
     public void registerReturnClick(View view) {
         FrameLayout frameLayout = getActivity().findViewById(R.id.login_fragment);
-        frameLayout.setPadding(0,0,0, DensityUtils.dp2px(getActivity(),90));
+        frameLayout.setPadding(0, 0, 0, DensityUtils.dp2px(getActivity(), 90));
         LoginFragment loginFragment = new LoginFragment();
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -136,7 +137,7 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
         return map;
     }
 
-    @OnClick(R.id.register_sign_up)
+    @OnClick(R.id.register_sign_up) //注册按钮点击事件
     public void signUp() {
         if (usernameText.getText().length() == 0) {
             usernameSign = false;
@@ -184,7 +185,6 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            System.out.println("sdsdsdsdsdsd");
         }
 
         @Override
@@ -314,5 +314,20 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
         textInputLayout.getEditText().setFocusable(true);
         textInputLayout.getEditText().setFocusableInTouchMode(true);
         textInputLayout.getEditText().requestFocus();
+    }
+
+    @Override
+    public void showNormal(){
+        CustomDiaFrag.newInstance("提示","你已经注册成功,是否前往登录").show(getFragmentManager(), getTag());
+    };
+
+    @Override
+    public void showError() {
+        CustomDiaFrag.newInstance("提示","该用户名已存在，请重新设置用户名").show(getFragmentManager(), getTag());
+    }
+
+    @Override
+    public void showErrorMsg(String errorMsg) {
+        CustomDiaFrag.newInstance("提示",errorMsg).show(getFragmentManager(), getTag());
     }
 }

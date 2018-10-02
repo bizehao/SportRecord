@@ -3,13 +3,13 @@ package com.bzh.sportrecord.model;
 public class ApiRegister {
 
     /**
-     * code : 200
-     * data : null
-     * message : 注册成功
+     * code : 422
+     * data : 0
+     * message : 注册失败
      */
 
     private String code;
-    private Object data;
+    private int data;
     private String message;
 
     public String getCode() {
@@ -20,11 +20,11 @@ public class ApiRegister {
         this.code = code;
     }
 
-    public Object getData() {
+    public int getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(int data) {
         this.data = data;
     }
 
@@ -34,14 +34,5 @@ public class ApiRegister {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    @Override
-    public String toString() {
-        return "ApiRegister{" +
-                "code='" + code + '\'' +
-                ", data=" + data +
-                ", message='" + message + '\'' +
-                '}';
     }
 }

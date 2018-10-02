@@ -52,7 +52,13 @@ public class RegisterPresenter implements RegisterContract.Presenter {
             @Override
             public <T> void run(T t) {
                 ApiRegister apiRegister = (ApiRegister) t;
-                System.out.println(apiRegister.toString());
+                if(apiRegister.getData() == 1){
+                    mView.showNormal();
+                }else if(apiRegister.getData() == 0){
+                    mView.showError();
+                }else {
+                    mView.showErrorMsg("未知错误，请稍后再试");
+                }
             }
         });
     }

@@ -12,6 +12,8 @@ public interface RegisterContract {
         //获取所有用户信息
         Map<String, String> getAllUserInfo();
 
+
+
     }
 
     interface Presenter extends BasePresenter<RegisterContract.View>{

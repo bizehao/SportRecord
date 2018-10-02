@@ -6,6 +6,10 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="MainTheme" parent="AppTheme">
@@ -33,6 +37,32 @@
         <item name="android:windowBackground">@drawable/launch_screen</item>
         <!--<item name="android:windowTranslucentStatus">true</item>--><!-- 半透明 -->
         <item name="android:windowFullscreen">true</item><!-- 全屏 -->
+    </style>
+
+    <!-- dialog样式 -->
+    <style name="bran_online_supervise_dialog" parent="@android:style/Theme.Dialog"><!-- @android:style/Theme.Dialog -->
+        <!-- 背景透明 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <!--透明度40%-->
+        <item name="android:backgroundDimAmount">0.4</item>
+        <!-- 浮于Activity之上 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- Dialog以外的区域模糊效果 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!-- 无标题 -->
+        <item name="android:windowNoTitle">false</item>
+        <!-- 半透明 -->
+        <item name="android:windowIsTranslucent">true</item>
+        <!-- Dialog进入及退出动画 -->
+        <item name="android:windowAnimationStyle">@style/bran_online_supervise_animation</item>
+    </style>
+    <!-- Dialog从底部进出动画 -->
+    <style name="bran_online_supervise_animation" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter_anim</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit_anim</item>
     </style>
 
 </resources>

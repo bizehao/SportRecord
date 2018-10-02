@@ -13,10 +13,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -30,9 +33,13 @@ import com.bzh.sportrecord.base.activity.BaseActivity;
 import com.bzh.sportrecord.module.home.homeNews.NewsFragment;
 import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.home.homeSport.SportFragment;
+import com.bzh.sportrecord.module.home.homeSport.WebSocketChatClient;
 import com.bzh.sportrecord.module.login.LoginActivity;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -75,6 +82,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     }
 
     @Override
+    protected void beforeInit() {
+        super.beforeInit();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN); //固定页面压制 bug:底部状态栏跟随键盘
+    }
+
+    @Override
     protected void inject() {
         activityComponent.inject(this);
     }
@@ -87,10 +100,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         mCircleImageView = navigationHeadView.findViewById(R.id.user_icon);
         mTextViewName = navigationHeadView.findViewById(R.id.user_name);
         mTextViewMotto = navigationHeadView.findViewById(R.id.user_motto);
-        if (mToolbar != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.mipmap.menu_carte);
-        }
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        //mToolbar.getBackground().mutate().setAlpha(225);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.app_name, R.string.app_name);
+        mDrawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+
         fragments[0] = new SportFragment();
         fragments[1] = new NewsFragment();
         fragments[2] = new PlanFragment();
@@ -186,13 +201,13 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     @Override
     protected void onStart() {
         super.onStart();
-        System.out.println("走了onStart");
     }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("走了onResume");
         if (App.getLoginSign()) {
             mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
             mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
@@ -207,12 +222,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         }
     }
 
-    @Override
-    protected boolean translucentStatusBar() { //透明状态栏
-        return true;
-    }
-
-    @Override
+    @Override // menu
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar, menu);
         return true;

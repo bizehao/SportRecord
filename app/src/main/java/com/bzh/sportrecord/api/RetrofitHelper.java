@@ -47,7 +47,7 @@ public class RetrofitHelper {
 
     private void resetApp() {
         mRetrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.1.200:8090/")
+                .baseUrl("http://192.168.1.196:8090/")
                 .client(client)
                 .addConverterFactory(gsonFactory)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())

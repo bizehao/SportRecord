@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/button_down" android:state_pressed="true"/>
-    <item android:drawable="@drawable/button_up" android:state_pressed="false"/>
+    <item android:state_pressed="true">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="@color/button_down"/>
+            <stroke android:width="0.7dp" android:color="#87cdff"/>
+            <corners android:radius="4dp"/>
+        </shape>
+    </item>
+    <item android:state_pressed="false">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="@color/button_up"/>
+            <stroke android:width="0.7dp" android:color="#87cdff"/>
+            <corners android:radius="4dp"/>
+        </shape>
+    </item>
 </selector>

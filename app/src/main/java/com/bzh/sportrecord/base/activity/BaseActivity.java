@@ -1,32 +1,18 @@
 package com.bzh.sportrecord.base.activity;
 
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.bzh.sofialibrary.Sofia;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
-import com.bzh.sportrecord.base.presenter.BasePresenter;
 import com.bzh.sportrecord.base.view.BaseView;
 import com.bzh.sportrecord.di.component.ActivityComponent;
 import com.bzh.sportrecord.di.component.DaggerActivityComponent;
 import com.bzh.sportrecord.di.module.ActivityModule;
-import com.bzh.sportrecord.ui.SystemBarTintManager;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import javax.inject.Inject;
-import javax.inject.Scope;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -52,13 +38,12 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         //AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        initSystemBarTint(); //状态栏
         beforeInit(); //初始化之前
         if (getContentViewLayoutID() != 0) {
             setContentView(getContentViewLayoutID());
             initView(savedInstanceState); //初始化
+            initSystemBarTint(); //状态栏
         }
-
     }
 
     @Override
@@ -89,8 +74,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     /**
      * 界面初始化前期准备
      */
-    protected void beforeInit() {
-    }
+    protected void beforeInit() { }
 
     ;
 
@@ -99,19 +83,13 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
      */
     protected abstract void initView(Bundle savedInstanceState);
 
-    /**
-     * 子类可以重写决定是否使用透明状态栏
-     */
-    protected boolean translucentStatusBar() {
-        return false;
-    }
 
     /**
      * 设置状态栏颜色
      */
-    protected void initSystemBarTint() {
+    /*protected void initSystemBarTint() {
         Window window = getWindow();
-        if (true) {//translucentStatusBar()
+        if (true) {
             // 设置状态栏全透明
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 System.out.println("================");
@@ -143,13 +121,22 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
             tintManager.setStatusBarTintEnabled(true);
             tintManager.setStatusBarTintColor(setStatusBarColor());
         }
-    }
+    }*/
+
+   /**
+    * 子类可以重写改变状态栏颜色
+    **/
+    /*protected int setStatusBarColor() {
+        return R.color.blue;
+    }*/
 
     /**
-     * 子类可以重写改变状态栏颜色
+     * 设置状态栏颜色
      */
-    protected int setStatusBarColor() {
-        return R.color.blue;
+    protected void initSystemBarTint() {
+     Sofia.with(this)
+                .statusBarBackground(ContextCompat.getColor(this, R.color.colorPrimary))
+                .navigationBarBackground(ContextCompat.getDrawable(this, R.color.colorNavigation));
     }
 
     private Toast mToast;
