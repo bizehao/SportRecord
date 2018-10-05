@@ -69,16 +69,4 @@ public class PlanFragment extends BaseFragment implements
         showToast(dialog.getDialogName());
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        FloatingActionButton floatingActionButton = getActivity().findViewById(R.id.home_float_button);
-        Glide.with(getActivity()).load(ContextCompat.getDrawable(getActivity(),R.mipmap.friends)).into(floatingActionButton);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
-            @Override
-            public void onClick(View v) {
-                FriendsActivity.open(getActivity());
-            }
-        });
-    }
 }

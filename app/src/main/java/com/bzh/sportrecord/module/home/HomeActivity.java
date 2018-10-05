@@ -35,6 +35,7 @@ import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.home.homeSport.SportFragment;
 import com.bzh.sportrecord.module.home.homeSport.WebSocketChatClient;
 import com.bzh.sportrecord.module.login.LoginActivity;
+import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -159,9 +160,43 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                 .setFirstSelectedPosition(0).initialise();
         getSupportFragmentManager().beginTransaction().replace(R.id.ttest, fragments[0]).commit();//设置默认的fragment
         mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, colors[0])));//设置默认颜色
+        Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this,R.mipmap.button_sport)).into(mFloatingActionButton);
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
+            @Override
+            public void onClick(View v) {
+                showToast("运动吧");
+            }
+        });
         mBottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
+                if(position == 0){
+                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this,R.mipmap.button_sport)).into(mFloatingActionButton);
+                    mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
+                        @Override
+                        public void onClick(View v) {
+                            showToast("运动吧");
+                        }
+                    });
+                }
+                if(position == 1){
+                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this,R.mipmap.button_sport)).into(mFloatingActionButton);
+                    mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
+                        @Override
+                        public void onClick(View v) {
+                            showToast("新闻记录");
+                        }
+                    });
+                }
+                if(position == 2){
+                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this,R.mipmap.friends)).into(mFloatingActionButton);
+                    mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
+                        @Override
+                        public void onClick(View v) {
+                            FriendsActivity.open(HomeActivity.this);
+                        }
+                    });
+                }
                 if (position < fragments.length) {
                     mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getApplication(), colors[position])));
                     FragmentManager fragmentManager = getSupportFragmentManager();

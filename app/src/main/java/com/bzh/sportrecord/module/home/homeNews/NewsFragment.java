@@ -55,15 +55,6 @@ public class NewsFragment extends BaseFragment {
 
     @Override
     protected void initView() {
-        System.out.println("初始化开始1111");
-        FloatingActionButton floatingActionButton = getActivity().findViewById(R.id.home_float_button);
-        Glide.with(getActivity()).load(ContextCompat.getDrawable(getActivity(),R.mipmap.button_sport)).into(floatingActionButton);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
-            @Override
-            public void onClick(View v) {
-                showToast("新闻记录");
-            }
-        });
         webSocketChatClient = App.getWebSocket();
         Map<String, List<Msgs>> map = App.getMap();
         List<Msgs> list = map.get("200");

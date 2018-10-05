@@ -17,6 +17,7 @@ import com.bzh.sportrecord.model.Friend;
 import com.bzh.sportrecord.utils.PinyinUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecycleViewAdapter.ViewHolder> {
 
-    private evenClickListener listener;
+    private evenClickListener listener; //点击 长按 事件
     private List<Friend> friends;
     private Context context;
 
@@ -36,6 +37,11 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
     public FriendsRecycleViewAdapter(List<Friend> friends, Context context) {
         this.friends = friends;
         this.context = context;
+        setFriends(friends);
+    }
+
+    public void setFriends(List<Friend> friends) {
+        this.friends = friends;
 
         for (int i = 0; i < friends.size(); i++) {
             //当前城市拼音首字母
@@ -47,7 +53,6 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
             }
         }
     }
-
 
     /**
      * 获取字母索引的位置
