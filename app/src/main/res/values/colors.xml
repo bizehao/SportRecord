@@ -17,4 +17,9 @@
     <color name="gray_light">#e8e8e8</color>
     <color name="colorNavigation">#2B2B2B</color>
     <color name="gray">#ab7e7979</color>
+    <color name="yello">#f3f700</color>
+    <color name="circle">#d11a4b</color>
+    <color name="rect">#1d9dd9</color>
+    <color name="triangle">#66d731</color>
+
 </resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_focused="true">
+        <shape
+            android:shape="rectangle">
+            <!-- 内容 -->
+            <solid android:color="#FFFFFF"/>
+
+            <corners android:radius="20dp" />
+            <!-- 线条 -->
+            <stroke
+                android:width="2dp"
+                android:color="@color/gray" />
+        </shape>
+    </item>
+    <item
+        android:state_focused="false">
+        <shape
+            android:shape="rectangle">
+            <!-- 内容 -->
+            <solid android:color="#FFFFFF"/>
+
+            <corners android:radius="20dp" />
+            <!-- 线条 -->
+            <stroke
+                android:width="2dp"
+                android:color="@color/tab_unchecked" />
+        </shape>
+    </item>
+</selector>

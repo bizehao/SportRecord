@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * @author 毕泽浩
  * @Description:
@@ -34,7 +36,7 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
 
     private HashMap<String, Integer> letterIndexes = new HashMap<>();//字母不一样的map集合
 
-    public FriendsRecycleViewAdapter(List<Friend> friends, Context context) {
+    public FriendsRecycleViewAdapter(Context context, List<Friend> friends) {
         this.friends = friends;
         this.context = context;
         setFriends(friends);
@@ -91,13 +93,17 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
 
     @Override
     public int getItemCount() {
-        return friends.size();
+        if(friends != null){
+            return friends.size();
+        }else {
+            return 0;
+        }
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView Initials; //首字母
-        private ImageView imageView; //头像
+        private CircleImageView imageView; //头像
         private TextView friendName; //用户姓名
 
         public ViewHolder(@NonNull View itemView) {

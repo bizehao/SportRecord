@@ -12,6 +12,10 @@ public class Friend {
     private String remarks; //备注
     private String pinyin; //拼音
 
+    public Friend(String name) {
+        this.name = name;
+    }
+
     public Friend(String name, String pinyin) {
         this.name = name;
         this.pinyin = pinyin;

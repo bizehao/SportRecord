@@ -52,6 +52,7 @@ public class FriendsActivity extends BaseActivity {
     List<Friend> friends; //好友集合
     List<Friend> screenFriends = new ArrayList<>(); //筛选后的好友
     FriendsRecycleViewAdapter adapter;
+
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_friends;
@@ -65,7 +66,7 @@ public class FriendsActivity extends BaseActivity {
     @Override
     protected void initView(Bundle savedInstanceState) {
         mToolbar.setTitle("我的联系人");
-        mToolbar.setOverflowIcon(ContextCompat.getDrawable(this,R.mipmap.menu_add));
+        mToolbar.setOverflowIcon(ContextCompat.getDrawable(this, R.mipmap.menu_add));
         setSupportActionBar(mToolbar);
         if (mToolbar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -83,7 +84,7 @@ public class FriendsActivity extends BaseActivity {
                 name = "阿三";
             }
 
-            friends.add(new Friend(name+i, PinyinUtils.getPinYin(name)));
+            friends.add(new Friend(name + i, PinyinUtils.getPinYin(name)));
         }
         shouUsers(friends);
 
@@ -129,14 +130,14 @@ public class FriendsActivity extends BaseActivity {
             public boolean onQueryTextChange(String s) {
                 screenFriends.clear();
                 String name = s.trim();
-                if(s.length() != 0 && !name.equals("")){
+                if (s.length() != 0 && !name.equals("")) {
                     adapter.setFriends(screenFriends);
                     adapter.notifyDataSetChanged();
-                    Pattern pattern = Pattern.compile(name,Pattern.CASE_INSENSITIVE);
-                    if(!name.equals("")){
-                        for(int i = 0; i<friends.size(); i++){
+                    Pattern pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
+                    if (!name.equals("")) {
+                        for (int i = 0; i < friends.size(); i++) {
                             Matcher matcher = pattern.matcher(friends.get(i).getName());
-                            if(matcher.find()){
+                            if (matcher.find()) {
                                 screenFriends.add(friends.get(i));
                             }
                         }
@@ -158,21 +159,21 @@ public class FriendsActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.add_friend:
-                FriendsDiaFrag.newInstance().show(getSupportFragmentManager(),getCallingPackage());
+                FriendsDiaFrag.newInstance().show(getSupportFragmentManager(), getCallingPackage());
                 break;
         }
         return true;
     }
 
     //展示好友列表
-    public void shouUsers(List<Friend> friends){
+    public void shouUsers(List<Friend> friends) {
         Collections.sort(friends, new Comparator<Friend>() {
             @Override
             public int compare(Friend o1, Friend o2) {
                 return o1.getPinyin().compareTo(o2.getPinyin());
             }
         });
-        adapter = new FriendsRecycleViewAdapter(friends, this);
+        adapter = new FriendsRecycleViewAdapter(this, friends);
         adapter.setListener(new FriendsRecycleViewAdapter.evenClickListener() {
             @Override
             public void setOnClickListener(View view) {
