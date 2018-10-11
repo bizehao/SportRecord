@@ -1,16 +1,16 @@
 package com.bzh.sportrecord;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.bzh.sportrecord.di.component.AppComponent;
 import com.bzh.sportrecord.di.component.DaggerAppComponent;
 import com.bzh.sportrecord.di.module.AppModule;
+import com.bzh.sportrecord.greenDao.DaoMaster;
+import com.bzh.sportrecord.greenDao.DaoSession;
 import com.bzh.sportrecord.model.Msgs;
-import com.bzh.sportrecord.module.home.homeNews.NewsFragment;
-import com.bzh.sportrecord.module.home.homeSport.SportFragment;
 import com.bzh.sportrecord.module.home.homeSport.WebSocketChatClient;
-import com.bzh.sportrecord.module.talk.model.User;
+
+import org.greenrobot.greendao.database.Database;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,16 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.Subject;
-
 public class App extends Application {
 
     public static AppComponent appComponent;
 
     private static WebSocketChatClient webSocketChatClient;
+
+    private static DaoSession daoSession;
 
     //用户
     private static User user;
@@ -59,16 +56,39 @@ public class App extends Application {
         map.put("100",list1);
         map.put("200",list2);
         map.put("300",list3);
+        init();
     }
 
+    //获取数据库操作
+    public static DaoSession getDaoSession(){
+        return daoSession;
+    }
+
+    //初始化greenDao
+    public void init(){
+        //初始化数据库
+        DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(this,"DATA_SportRecord");
+        Database db = openHelper.getWritableDb();
+        DaoMaster daoMaster = new DaoMaster(db);
+        daoSession = daoMaster.newSession();
+    }
+
+    //获取消息集合
     public static Map<String, List<Msgs>> getMap() {
         return map;
     }
 
+    //获取webSocket连接
     public static WebSocketChatClient getWebSocket(){ //获取webSocket连接
         return webSocketChatClient;
     }
 
+    /**
+     * 设置用户信息
+     * @param loginSign
+     * @param username
+     * @param token
+     */
     public static void setUser(boolean loginSign,String username,String token){
         user.setLoginSign(loginSign);
         user.setUsername(username);

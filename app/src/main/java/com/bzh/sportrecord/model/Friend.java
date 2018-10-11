@@ -8,7 +8,7 @@ package com.bzh.sportrecord.model;
 public class Friend {
 
     private String name;
-    private int imageId;
+    private String image;
     private String remarks; //备注
     private String pinyin; //拼音
 
@@ -16,8 +16,9 @@ public class Friend {
         this.name = name;
     }
 
-    public Friend(String name, String pinyin) {
+    public Friend(String name,String image, String pinyin) {
         this.name = name;
+        this.image = image;
         this.pinyin = pinyin;
     }
 
@@ -29,12 +30,12 @@ public class Friend {
         this.name = name;
     }
 
-    public int getImageId() {
-        return imageId;
+    public String getImage() {
+        return image;
     }
 
-    public void setImageId(int imageId) {
-        this.imageId = imageId;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getRemarks() {

@@ -1,19 +1,23 @@
 package com.bzh.sportrecord.model;
 
+import java.util.List;
+
 /**
- * 用户信息
+ * @author 毕泽浩
+ * @Description:
+ * @time 2018/10/8 13:22
  */
-public class ApiUserInfo {
+public class ApiFriends {
 
     /**
      * code : 200
-     * data : {"username":"***","name":"李四","headportrait":"222","descript":"喜欢打羽毛球","address":"山西,运城","motto":"人无完人,天无完天"}
-     * message :
+     * data : [{"username":"test","name":null,"headportrait":null,"descript":null,"address":null,"motto":null,"remark_NAME":null},{"username":"zhangsan","name":"张三","headportrait":"111","descript":"男生,喜欢运动","address":"北京,丰台区","motto":"好好学习,天天向上","remark_NAME":null},{"username":"236554","name":null,"headportrait":null,"descript":null,"address":null,"motto":null,"remark_NAME":null}]
+     * RequestMessage : 查询成功
      */
 
     private String code;
-    private DataBean data;
-    private String message;
+    private String RequestMessage;
+    private List<DataBean> data;
 
     public String getCode() {
         return code;
@@ -23,37 +27,40 @@ public class ApiUserInfo {
         this.code = code;
     }
 
-    public DataBean getData() {
+    public String getRequestMessage() {
+        return RequestMessage;
+    }
+
+    public void setRequestMessage(String RequestMessage) {
+        this.RequestMessage = RequestMessage;
+    }
+
+    public List<DataBean> getData() {
         return data;
     }
 
-    public void setData(DataBean data) {
+    public void setData(List<DataBean> data) {
         this.data = data;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     public static class DataBean {
         /**
-         * username: ***
-         * name : 李四
-         * headportrait : 222
-         * descript : 喜欢打羽毛球
-         * address : 山西,运城
-         * motto : 人无完人,天无完天
+         * username : test
+         * name : null
+         * headportrait : null
+         * descript : null
+         * address : null
+         * motto : null
+         * remark_NAME : null
          */
+
         private String username;
         private String name;
         private String headportrait;
         private String descript;
         private String address;
         private String motto;
+        private String remarkName;
 
         public String getUsername() {
             return username;
@@ -62,6 +69,7 @@ public class ApiUserInfo {
         public void setUsername(String username) {
             this.username = username;
         }
+
         public String getName() {
             return name;
         }
@@ -102,25 +110,12 @@ public class ApiUserInfo {
             this.motto = motto;
         }
 
-        @Override
-        public String toString() {
-            return "DataBean{" +
-                    "username='" + username + '\'' +
-                    ", name='" + name + '\'' +
-                    ", headportrait='" + headportrait + '\'' +
-                    ", descript='" + descript + '\'' +
-                    ", address='" + address + '\'' +
-                    ", motto='" + motto + '\'' +
-                    '}';
+        public String getRemarkName() {
+            return remarkName;
         }
-    }
 
-    @Override
-    public String toString() {
-        return "ApiUserInfo{" +
-                "code='" + code + '\'' +
-                ", data=" + data +
-                ", message='" + message + '\'' +
-                '}';
+        public void setRemarkName(String remarkName) {
+            this.remarkName = remarkName;
+        }
     }
 }

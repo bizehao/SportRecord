@@ -1,32 +1,49 @@
 package com.bzh.sportrecord.module.home;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.App;
+import com.bzh.sportrecord.BuildConfig;
+import com.bzh.sportrecord.MainActivity;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.api.DataManager;
 import com.bzh.sportrecord.base.activity.BaseActivity;
@@ -36,10 +53,15 @@ import com.bzh.sportrecord.module.home.homeSport.SportFragment;
 import com.bzh.sportrecord.module.home.homeSport.WebSocketChatClient;
 import com.bzh.sportrecord.module.login.LoginActivity;
 import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
+import com.bzh.sportrecord.utils.CommonUtil;
+import com.bzh.sportrecord.utils.FileUtil;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -47,6 +69,11 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+
+import static com.bzh.sportrecord.utils.FileUtil.getRealFilePathFromUri;
 
 public class HomeActivity extends BaseActivity implements HomeContract.View {
 
@@ -70,6 +97,11 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     TextView mTextViewName;
 
     TextView mTextViewMotto;
+
+    //调用照相机返回图片文件
+    private File tempFile;
+    // 1: qq, 2: weixin
+    private int type = 1;
 
     @Inject
     HomeContract.Presenter mPresenter;
@@ -101,6 +133,13 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         mCircleImageView = navigationHeadView.findViewById(R.id.user_icon);
         mTextViewName = navigationHeadView.findViewById(R.id.user_name);
         mTextViewMotto = navigationHeadView.findViewById(R.id.user_motto);
+        mCircleImageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) { //选择图像
+                uploadHeadImage();
+                return true;
+            }
+        });
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         //mToolbar.getBackground().mutate().setAlpha(225);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.app_name, R.string.app_name);
@@ -160,7 +199,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                 .setFirstSelectedPosition(0).initialise();
         getSupportFragmentManager().beginTransaction().replace(R.id.ttest, fragments[0]).commit();//设置默认的fragment
         mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, colors[0])));//设置默认颜色
-        Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this,R.mipmap.button_sport)).into(mFloatingActionButton);
+        Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.button_sport)).into(mFloatingActionButton);
         mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
             @Override
             public void onClick(View v) {
@@ -170,8 +209,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         mBottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
             public void onTabSelected(int position) {
-                if(position == 0){
-                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this,R.mipmap.button_sport)).into(mFloatingActionButton);
+                if (position == 0) {
+                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.button_sport)).into(mFloatingActionButton);
                     mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
                         @Override
                         public void onClick(View v) {
@@ -179,8 +218,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                         }
                     });
                 }
-                if(position == 1){
-                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this,R.mipmap.button_sport)).into(mFloatingActionButton);
+                if (position == 1) {
+                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.button_sport)).into(mFloatingActionButton);
                     mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
                         @Override
                         public void onClick(View v) {
@@ -188,8 +227,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                         }
                     });
                 }
-                if(position == 2){
-                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this,R.mipmap.friends)).into(mFloatingActionButton);
+                if (position == 2) {
+                    Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.friends)).into(mFloatingActionButton);
                     mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
                         @Override
                         public void onClick(View v) {
@@ -231,14 +270,20 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
             public void onTabReselected(int position) {
             }
         });
+
+    }
+
+    //跳转到这儿
+    public static void open(Context context){
+        Intent intent = new Intent(context, HomeActivity.class);
+        context.startActivity(intent); //跳转到home页面
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
     }
-
-
 
     @Override
     protected void onResume() {
@@ -286,8 +331,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     }
 
     @Override
-    public void setHeadPortrait(int image) {
-        Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.drawable.user_icon)).into(mCircleImageView);
+    public void setHeadPortrait(Bitmap bitmap) {
+        Glide.with(this).load(bitmap).into(mCircleImageView);
     }
 
     @Override
@@ -298,5 +343,190 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     @Override
     public void setHeadMotto(String motto) {
         mTextViewMotto.setText(motto);
+    }
+
+    /**
+     * 上传头像
+     */
+    private void uploadHeadImage() {
+        View view = LayoutInflater.from(HomeActivity.this).inflate(R.layout.dialog_imgchoose, null);
+        TextView btnCarema = view.findViewById(R.id.btn_camera); //拍照
+        TextView btnPhoto = view.findViewById(R.id.btn_photo); //相册
+        TextView btnCancel = view.findViewById(R.id.btn_cancel); //取消
+        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        popupWindow.setBackgroundDrawable(ContextCompat.getDrawable(HomeActivity.this, android.R.color.transparent));
+        popupWindow.setOutsideTouchable(true);
+        View parent = LayoutInflater.from(HomeActivity.this).inflate(R.layout.activity_home, null);
+        popupWindow.showAtLocation(parent, Gravity.BOTTOM, 0, 0);
+        //popupWindow在弹窗的时候背景半透明
+        final WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.alpha = 0.5f;
+        getWindow().setAttributes(params);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                params.alpha = 1.0f;
+                getWindow().setAttributes(params);
+            }
+        });
+        btnCarema.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //权限判断
+                if (ContextCompat.checkSelfPermission(HomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    //申请WRITE_EXTERNAL_STORAGE权限
+                    ActivityCompat.requestPermissions(HomeActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            CommonUtil.WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
+                } else {
+                    //跳转到调用系统相机
+                    gotoCamera();
+                }
+                popupWindow.dismiss();
+            }
+        });
+        btnPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //权限判断
+                if (ContextCompat.checkSelfPermission(HomeActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    //申请READ_EXTERNAL_STORAGE权限
+                    ActivityCompat.requestPermissions(HomeActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            CommonUtil.READ_EXTERNAL_STORAGE_REQUEST_CODE);
+                } else {
+                    //跳转到相册
+                    gotoPhoto();
+                }
+                popupWindow.dismiss();
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+    }
+
+    /**
+     * 外部存储权限申请返回
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CommonUtil.WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission Granted
+                gotoCamera();
+            }
+        } else if (requestCode == CommonUtil.READ_EXTERNAL_STORAGE_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission Granted
+                gotoPhoto();
+            }
+        }
+    }
+
+    /**
+     * 跳转到相册
+     */
+    private void gotoPhoto() {
+        Log.d("evan", "*****************打开图库********************");
+        //跳转到调用系统图库
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(Intent.createChooser(intent, "请选择图片"), CommonUtil.REQUEST_PICK);
+    }
+
+
+    /**
+     * 跳转到照相机
+     */
+    private void gotoCamera() {
+        Log.d("evan", "*****************打开相机********************");
+        //创建拍照存储的图片文件
+        tempFile = new File(FileUtil.checkDirPath(Environment.getExternalStorageDirectory().getPath() + "/image/"), System.currentTimeMillis() + ".jpg");
+
+        //跳转到调用系统相机
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            //设置7.0中共享文件，分享路径定义在xml/file_paths.xml
+            intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            Uri contentUri = FileProvider.getUriForFile(HomeActivity.this, BuildConfig.APPLICATION_ID + ".fileProvider", tempFile);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri);
+        } else {
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tempFile));
+        }
+        startActivityForResult(intent, CommonUtil.REQUEST_CAPTURE);
+    }
+
+    /**
+     * 调用某个活动后的返回处理
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param intent
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        switch (requestCode) {
+            case CommonUtil.REQUEST_CAPTURE: //调用系统相机返回
+                if (resultCode == RESULT_OK) {
+                    gotoClipActivity(Uri.fromFile(tempFile));
+                }
+                break;
+            case CommonUtil.REQUEST_PICK:  //调用系统相册返回
+                System.out.println("相册相册相册相册相册相册");
+                if (resultCode == RESULT_OK) {
+                    Uri uri = intent.getData();
+                    gotoClipActivity(uri);
+                }
+                break;
+            case CommonUtil.REQUEST_CROP_PHOTO:  //剪切图片返回
+                if (resultCode == RESULT_OK) {
+                    final Uri uri = intent.getData();
+                    if (uri == null) {
+                        return;
+                    }
+                    String cropImagePath = getRealFilePathFromUri(getApplicationContext(), uri);
+                    Bitmap bitMap = BitmapFactory.decodeFile(cropImagePath);
+
+                    if (type == 1) {
+                        //上传图片
+                        DataManager dataManager = DataManager.getInstance();
+                        File file = new File(cropImagePath);
+                        // 创建 RequestBody，用于封装构建RequestBody
+                        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+                        // MultipartBody.Part  和后端约定好Key，这里的partName是用image
+                        MultipartBody.Part body = MultipartBody.Part.createFormData("headPortrait", file.getName(), requestFile);
+                        RequestBody username = RequestBody.create(MediaType.parse("text/x-markdown"), "lisi");
+                        dataManager.successHandler(dataManager.uploadPng(username, body), new DataManager.callBack() {
+                            @Override
+                            public <T> void run(T t) {
+                                System.out.println("上传成功");
+                                mCircleImageView.setImageBitmap(bitMap);
+                            }
+                        });
+                    } else {
+                        mCircleImageView.setImageBitmap(bitMap);
+                    }
+                }
+                break;
+        }
+    }
+
+
+    /**
+     * 打开截图界面
+     */
+    public void gotoClipActivity(Uri uri) {
+        if (uri == null) {
+            return;
+        }
+        Intent intent = new Intent();
+        intent.setClass(this, ClipImageActivity.class);
+        intent.putExtra("type", type);
+        intent.setData(uri);
+        startActivityForResult(intent, CommonUtil.REQUEST_CROP_PHOTO);
     }
 }

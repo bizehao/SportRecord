@@ -1,9 +1,11 @@
 package com.bzh.sportrecord.model;
 
+import java.util.List;
+
 /**
- * 用户信息
+ * 用户信息(模糊搜索，多个用户)
  */
-public class ApiUserInfo {
+public class ApiUserInfos {
 
     /**
      * code : 200
@@ -12,7 +14,7 @@ public class ApiUserInfo {
      */
 
     private String code;
-    private DataBean data;
+    private List<DataBean> data;
     private String message;
 
     public String getCode() {
@@ -23,11 +25,11 @@ public class ApiUserInfo {
         this.code = code;
     }
 
-    public DataBean getData() {
+    public List<DataBean> getData() {
         return data;
     }
 
-    public void setData(DataBean data) {
+    public void setData(List<DataBean> data) {
         this.data = data;
     }
 
@@ -54,6 +56,11 @@ public class ApiUserInfo {
         private String descript;
         private String address;
         private String motto;
+        private boolean isExit;
+
+        public DataBean(String username) {
+            this.username = username;
+        }
 
         public String getUsername() {
             return username;
@@ -102,6 +109,14 @@ public class ApiUserInfo {
             this.motto = motto;
         }
 
+        public boolean isExit() {
+            return isExit;
+        }
+
+        public void setExit(boolean exit) {
+            isExit = exit;
+        }
+
         @Override
         public String toString() {
             return "DataBean{" +
@@ -111,6 +126,7 @@ public class ApiUserInfo {
                     ", descript='" + descript + '\'' +
                     ", address='" + address + '\'' +
                     ", motto='" + motto + '\'' +
+                    ", isExit=" + isExit +
                     '}';
         }
     }

@@ -7,7 +7,7 @@
             <!-- 内容 -->
             <solid android:color="#FFFFFF"/>
 
-            <corners android:radius="20dp" />
+            <corners android:radius="0dp" />
             <!-- 线条 -->
             <stroke
                 android:width="2dp"
@@ -21,7 +21,7 @@
             <!-- 内容 -->
             <solid android:color="#FFFFFF"/>
 
-            <corners android:radius="20dp" />
+            <corners android:radius="0dp" />
             <!-- 线条 -->
             <stroke
                 android:width="2dp"

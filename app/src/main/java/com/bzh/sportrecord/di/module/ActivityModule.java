@@ -1,6 +1,8 @@
 package com.bzh.sportrecord.di.module;
 
 import android.content.Context;
+
+import com.bzh.sportrecord.base.presenter.BasePresenter;
 import com.bzh.sportrecord.base.view.BaseView;
 import com.bzh.sportrecord.module.home.HomeContract;
 import com.bzh.sportrecord.module.home.HomePresenter;
@@ -19,6 +21,7 @@ public class ActivityModule {
         this.baseView = baseView;
     }
 
+    //主页
     @Provides
     HomeContract.Presenter providesHomePresenter(){
         return new HomePresenter(context, (HomeContract.View) baseView);

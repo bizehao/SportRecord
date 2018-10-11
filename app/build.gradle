@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'org.greenrobot.greendao'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
@@ -21,6 +21,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+}
+
+greendao {
+    schemaVersion 1 //当前数据库版本
+    daoPackage 'com.bzh.sportrecord.greenDao'//自动生成代码所在的包名
+    targetGenDir 'src/main/java'//设置自动生成代码的目录。
 }
 
 dependencies {
@@ -62,4 +68,6 @@ dependencies {
     implementation 'com.github.stfalcon:chatkit:0.3.1'
     //拼音
     implementation 'com.belerweb:pinyin4j:2.5.0'
+    //greendao数据库框架
+    implementation 'org.greenrobot:greendao:3.2.2' // add library
 }

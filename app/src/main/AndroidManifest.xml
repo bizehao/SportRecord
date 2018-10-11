@@ -2,7 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bzh.sportrecord">
 
+    <!-- 网络权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 读取外部存储器 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 写入外部存储器 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- 网络权限 -->
     <!-- android:theme="@style/AppTheme" -->
@@ -15,6 +20,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.bzh.sportrecord.fileProvider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <activity android:name=".MainActivity"> <!-- add  android:theme="@style/AppTheme.Launcher" -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,9 +42,8 @@
         <activity android:name=".module.home.HomeActivity" />
         <activity android:name=".module.setup.SetupActivity" />
         <activity android:name=".module.talk.talkMessage.MessageActivity" />
-        <activity android:name=".module.talk.talkDialogs.DialogsActivity" />
         <activity android:name=".module.talk.talkFriends.FriendsActivity" />
-        <activity android:name=".module.talk.addFriends.AddfriendsActivity"></activity>
+        <activity android:name=".module.home.ClipImageActivity"></activity>
     </application>
 
 </manifest>

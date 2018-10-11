@@ -69,11 +69,7 @@ public class LoginPresenter implements LoginContract.Presenter {
                 System.out.println("登陆成功,跳转页面");
                 System.out.println("保存用户信息");
                 App.setUser(true,apiLogin.getData().getUsername(),apiLogin.getData().getX_Auth_Token());
-                Log.d(TAG, "run: "+App.getLoginSign());
-                Log.d(TAG, "run: "+App.getUsername());
-                Log.d(TAG, "run: "+App.getToken());
-                Intent intent = new Intent(mContext, HomeActivity.class);
-                mContext.startActivity(intent); //跳转到home页面
+                HomeActivity.open(mContext);
                 mView.shutDownLoading();
                 LoginActivity loginActivity = (LoginActivity) mContext;
                 loginActivity.finish();

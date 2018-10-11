@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.fragment.BaseFragment;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginFragment;
-import com.bzh.sportrecord.ui.CustomDiaFrag;
+import com.bzh.sportrecord.ui.dialog.CustomDiaFrag;
 import com.bzh.sportrecord.utils.DensityUtils;
 
 import java.util.HashMap;

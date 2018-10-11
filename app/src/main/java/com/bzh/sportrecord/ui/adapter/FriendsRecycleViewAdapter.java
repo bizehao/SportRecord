@@ -1,7 +1,13 @@
 package com.bzh.sportrecord.ui.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -14,10 +20,15 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.model.Friend;
+import com.bzh.sportrecord.utils.CommonUtil;
 import com.bzh.sportrecord.utils.PinyinUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 
@@ -75,12 +86,24 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
         return viewHolder;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Friend friend = friends.get(i);
         viewHolder.friendName.setText(friend.getName());
-        Glide.with(context).load(R.drawable.user_icon).into(viewHolder.imageView);
-
+        String pic = friend.getImage();
+        if(pic != null){
+            //解码
+            Base64.Decoder decoder = Base64.getDecoder();
+            byte[] bytes = decoder.decode(friend.getImage());
+            //Bitmap bitMap = BitmapFactory.decodeStream(new ByteArrayInputStream(bytes));
+            Bitmap bitMap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+            //viewHolder.imageView.setImageBitmap(bitMap);
+            //BitmapDrawable bd= new BitmapDrawable(context.getResources(), bitMap);
+            Glide.with(context).load(bitMap).into(viewHolder.imageView);
+        }else {
+            Glide.with(context).load(R.drawable.user_icon).into(viewHolder.imageView);
+        }
         String currentLetter = PinyinUtils.getFirstLetter(friend.getPinyin());
         String previousLetter = i >= 1 ? PinyinUtils.getFirstLetter(friends.get(i - 1).getPinyin()) : "";
         if (!TextUtils.equals(currentLetter, previousLetter)) {

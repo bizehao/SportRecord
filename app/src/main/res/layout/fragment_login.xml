@@ -36,6 +36,7 @@
             android:maxLines="1"
             android:imeOptions="actionNext"
             android:inputType="text"
+            android:text="lisi"
             android:hint="用户名" />
     </android.support.design.widget.TextInputLayout>
 
@@ -53,6 +54,7 @@
             android:maxLines="1"
             android:inputType="textPassword"
             android:imeOptions="actionDone"
+            android:text="123123"
             android:hint="密码"/>
 
     </android.support.design.widget.TextInputLayout>

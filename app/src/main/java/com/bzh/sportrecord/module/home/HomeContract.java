@@ -1,5 +1,7 @@
 package com.bzh.sportrecord.module.home;
 
+import android.graphics.Bitmap;
+
 import com.bzh.sportrecord.base.presenter.BasePresenter;
 import com.bzh.sportrecord.base.view.BaseView;
 
@@ -9,9 +11,9 @@ public interface HomeContract {
         /**
          * 设置头像
          *
-         * @param image
+         * @param bitmap
          */
-        void setHeadPortrait(int image);
+        void setHeadPortrait(Bitmap bitmap);
 
         /**
          * 设置名称

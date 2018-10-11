@@ -28,11 +28,13 @@ public class FragmentModule {
         this.baseView = baseView;
     }
 
+    //登录
     @Provides
     LoginContract.Presenter providesLoginPresenter(){
         return new LoginPresenter(context, (LoginContract.View) baseView);
     }
 
+    //注册
     @Provides
     RegisterContract.Presenter providesRegisterPresenter(){
         return new RegisterPresenter(context, (RegisterContract.View) baseView);

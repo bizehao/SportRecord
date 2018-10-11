@@ -3,8 +3,6 @@ package com.bzh.sportrecord.module.talk.talkFriends;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,17 +13,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
+import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.activity.BaseActivity;
+import com.bzh.sportrecord.greenDao.DaoSession;
+import com.bzh.sportrecord.greenModel.FriendsInfo;
 import com.bzh.sportrecord.model.Friend;
-import com.bzh.sportrecord.module.talk.talkMessage.MessageActivity;
-import com.bzh.sportrecord.ui.CustomDiaFrag;
 import com.bzh.sportrecord.ui.adapter.FriendsRecycleViewAdapter;
-import com.bzh.sportrecord.ui.widget.FriendsDiaFrag;
+import com.bzh.sportrecord.ui.dialog.FriendsDiaFrag;
+import com.bzh.sportrecord.ui.dialog.RedFriendDiaFrag;
 import com.bzh.sportrecord.ui.widget.SideLetterBar;
 import com.bzh.sportrecord.utils.PinyinUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -72,20 +70,19 @@ public class FriendsActivity extends BaseActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         friends = new ArrayList<>();
-        String name;
-        for (int i = 0; i < 20; i++) {
-            if (i < 5) {
-                name = "张三五";
-            } else if (i < 10) {
-                name = "李三";
-            } else if (i < 15) {
-                name = "王三五";
-            } else {
-                name = "阿三";
-            }
-
-            friends.add(new Friend(name + i, PinyinUtils.getPinYin(name)));
+        //请求获取所有好友信息
+        DaoSession daoSession = App.getDaoSession();
+        List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
+        System.out.println(list);
+        for (int i = 0; i < list.size(); i++) {
+            friends.add(new Friend(list.get(i).getRemarkname(),list.get(i).getHeadportrait(), PinyinUtils.getPinYin(list.get(i).getRemarkname())));
         }
+        Collections.sort(friends, new Comparator<Friend>() {
+            @Override
+            public int compare(Friend o1, Friend o2) {
+                return o1.getPinyin().compareTo(o2.getPinyin());
+            }
+        });
         shouUsers(friends);
 
     }
@@ -161,18 +158,14 @@ public class FriendsActivity extends BaseActivity {
             case R.id.add_friend:
                 FriendsDiaFrag.newInstance().show(getSupportFragmentManager(), getCallingPackage());
                 break;
+            case R.id.recommend_friend:
+                RedFriendDiaFrag.newInstance().show(getSupportFragmentManager(), getCallingPackage());
         }
         return true;
     }
 
     //展示好友列表
     public void shouUsers(List<Friend> friends) {
-        Collections.sort(friends, new Comparator<Friend>() {
-            @Override
-            public int compare(Friend o1, Friend o2) {
-                return o1.getPinyin().compareTo(o2.getPinyin());
-            }
-        });
         adapter = new FriendsRecycleViewAdapter(this, friends);
         adapter.setListener(new FriendsRecycleViewAdapter.evenClickListener() {
             @Override
@@ -196,5 +189,24 @@ public class FriendsActivity extends BaseActivity {
                 layoutManager.scrollToPositionWithOffset(position, 0);
             }
         });
+    }
+
+    public void refresh(){
+        friends.clear();
+        DaoSession daoSession = App.getDaoSession();
+        List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
+        System.out.println(list);
+        for (int i = 0; i < list.size(); i++) {
+            friends.add(new Friend(list.get(i).getRemarkname(), list.get(i).getHeadportrait(), PinyinUtils.getPinYin(list.get(i).getRemarkname())));
+        }
+
+        adapter.setFriends(friends);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("执行了onResume");
     }
 }
