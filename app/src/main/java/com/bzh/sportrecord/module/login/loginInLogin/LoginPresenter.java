@@ -44,11 +44,6 @@ public class LoginPresenter implements LoginContract.Presenter {
     }
 
     @Override
-    public void addRxBindingSubscribe(Disposable disposable) {
-
-    }
-
-    @Override
     public int getCurrentPage() {
         return 0;
     }

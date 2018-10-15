@@ -34,11 +34,6 @@ public class RegisterPresenter implements RegisterContract.Presenter {
     }
 
     @Override
-    public void addRxBindingSubscribe(Disposable disposable) {
-
-    }
-
-    @Override
     public int getCurrentPage() {
         return 0;
     }

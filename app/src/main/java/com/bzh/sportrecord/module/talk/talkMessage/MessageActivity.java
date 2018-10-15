@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bzh.chatkit.commons.ImageLoader;
 import com.bzh.chatkit.messages.MessageInput;
@@ -26,24 +25,19 @@ import com.bzh.sportrecord.base.activity.BaseActivity;
 import com.bzh.sportrecord.greenDao.DaoSession;
 import com.bzh.sportrecord.greenDao.MessageInfoDao;
 import com.bzh.sportrecord.greenModel.MessageInfo;
-import com.bzh.sportrecord.model.Friend;
 import com.bzh.sportrecord.model.Talk;
 import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
-import com.bzh.sportrecord.module.talk.model.Dialog;
 import com.bzh.sportrecord.module.talk.model.Message;
 import com.bzh.sportrecord.module.talk.model.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;

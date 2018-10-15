@@ -5,6 +5,7 @@ import com.bzh.sportrecord.base.view.BaseView;
 import com.bzh.sportrecord.di.module.ActivityModule;
 import com.bzh.sportrecord.di.module.FragmentModule;
 import com.bzh.sportrecord.module.home.HomeActivity;
+import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginFragment;
 import com.bzh.sportrecord.module.login.loginInRegister.RegisterFragment;
 
@@ -18,7 +19,12 @@ import dagger.Component;
 @Component(modules = {FragmentModule.class})
 public interface FragmentComponent {
 
+    //登录
     void inject(LoginFragment loginFragment);
 
+    //注册
     void inject(RegisterFragment registerFragment);
+
+    //通信
+    void inject(PlanFragment planFragment);
 }

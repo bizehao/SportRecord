@@ -1,5 +1,7 @@
 package com.bzh.sportrecord.module.login;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.activity.BaseActivity;
+import com.bzh.sportrecord.module.home.HomeActivity;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginFragment;
 
 import butterknife.BindView;
@@ -59,6 +62,11 @@ public class LoginActivity extends BaseActivity {
 
     }
 
+    public static void open(Context context){
+        Intent intent = new Intent(context,LoginActivity.class);
+        context.startActivity(intent);
+    }
+
     /**
      * 添加登录fragment
      * @param fragment
@@ -67,5 +75,12 @@ public class LoginActivity extends BaseActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.login_fragment,fragment).commit();
+    }
+
+    //back键
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        HomeActivity.open(this);
     }
 }

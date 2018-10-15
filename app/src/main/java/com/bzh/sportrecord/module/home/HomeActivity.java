@@ -1,6 +1,7 @@
 package com.bzh.sportrecord.module.home;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -151,15 +152,15 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                 Intent instant;
                 switch (menuItem.getItemId()) {
                     case R.id.nav_login:
-                        showToast("登录");
-                        instant = new Intent(HomeActivity.this, LoginActivity.class);
-                        startActivity(instant);
+                        LoginActivity.open(HomeActivity.this);
                         break;
                     case R.id.nav_loginout:
                         showToast("注销");
+                        loginFail();
                         App.setLoginSign(false);
                         instant = new Intent(HomeActivity.this, LoginActivity.class);
                         startActivity(instant);
+                        HomeActivity.this.finish();
                         break;
                     case R.id.nav_nocturnal_pattern:
                         showToast("夜间模式");
@@ -267,7 +268,6 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     public static void open(Context context){
         Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent); //跳转到home页面
-
     }
 
     @Override
@@ -280,20 +280,29 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         super.onResume();
         if(App.getWhetherVerify()){
             if (App.getLoginSign()) {
-                mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-                mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
-                //加载用户信息
-                mPresenter.loadData(App.getUsername());
-                App.setWhetherVerify(false);//设置验证状态为下次不用验证
+                loginSuccess();
             } else {
-                mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
-                mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
-                Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.mipmap.no_login_user)).into(mCircleImageView);
-                mTextViewName.setText("未登录");
-                mTextViewMotto.setText("");
-                App.setWhetherVerify(true);
+                loginFail();
             }
         }
+    }
+    //登录成功
+    public void loginSuccess(){
+        mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+        mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
+        //加载用户信息
+        mPresenter.loadData(App.getUsername());
+        App.setWhetherVerify(false);//设置验证状态为下次不用验证
+    }
+
+    //登录失败
+    public void loginFail(){
+        mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+        mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
+        Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.mipmap.no_login_user)).into(mCircleImageView);
+        mTextViewName.setText("未登录");
+        mTextViewMotto.setText("");
+        App.setWhetherVerify(true);
     }
 
     @Override // menu
@@ -520,5 +529,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         intent.putExtra("type", type);
         intent.setData(uri);
         startActivityForResult(intent, CommonUtil.REQUEST_CROP_PHOTO);
+    }
+
+    //back键
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        System.exit(0);
     }
 }

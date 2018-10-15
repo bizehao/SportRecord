@@ -47,11 +47,6 @@ public class HomePresenter implements HomeContract.Presenter {
     }
 
     @Override
-    public void addRxBindingSubscribe(Disposable disposable) {
-
-    }
-
-    @Override
     public int getCurrentPage() {
         return 0;
     }

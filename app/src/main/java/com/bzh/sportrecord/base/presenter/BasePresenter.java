@@ -18,13 +18,6 @@ public interface BasePresenter<T extends BaseView> {
     void detachView();
 
     /**
-     * Add rxBing subscribe manager
-     *
-     * @param disposable Disposable
-     */
-    void addRxBindingSubscribe(Disposable disposable);
-
-    /**
      * 获取当前页
      *
      * @return current page

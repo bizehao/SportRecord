@@ -133,7 +133,7 @@ public class FriendsActivity extends BaseActivity {
                     Pattern pattern = Pattern.compile(name, Pattern.CASE_INSENSITIVE);
                     if (!name.equals("")) {
                         for (int i = 0; i < friends.size(); i++) {
-                            Matcher matcher = pattern.matcher(friends.get(i).getName());
+                            Matcher matcher = pattern.matcher(friends.get(i).getRemarks());
                             if (matcher.find()) {
                                 screenFriends.add(friends.get(i));
                             }

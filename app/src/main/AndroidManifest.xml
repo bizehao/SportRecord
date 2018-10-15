@@ -24,8 +24,8 @@
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.bzh.sportrecord.fileProvider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
@@ -41,8 +41,12 @@
         <activity android:name=".module.login.LoginActivity" />
         <activity android:name=".module.home.HomeActivity" />
         <activity android:name=".module.setup.SetupActivity" />
-        <activity android:name=".module.talk.talkMessage.MessageActivity" />
-        <activity android:name=".module.talk.talkFriends.FriendsActivity" />
+        <activity
+            android:name=".module.talk.talkMessage.MessageActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".module.talk.talkFriends.FriendsActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".module.home.ClipImageActivity"></activity>
     </application>
 
