@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SportRecord.iml" filepath="$PROJECT_DIR$/SportRecord.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chatkit/chatkit.iml" filepath="$PROJECT_DIR$/chatkit/chatkit.iml" />
       <module fileurl="file://$PROJECT_DIR$/dialoglibrary/dialoglibrary.iml" filepath="$PROJECT_DIR$/dialoglibrary/dialoglibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/sofialibrary/sofialibrary.iml" filepath="$PROJECT_DIR$/sofialibrary/sofialibrary.iml" />
     </modules>

@@ -9,32 +9,18 @@ public class Talk {
     private String code;
     private String sender;
     private String receiver;
-    private Data data = new Data();
+    private String time;
+    private String message;
 
     public Talk() {
-        setCode("200");
-        setSender("张三");
     }
 
-    static class Data{
-        private String time;
-        private String message;
-
-        public String getTime() {
-            return time;
-        }
-
-        public void setTime(String time) {
-            this.time = time;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
+    public Talk(String code, String sender, String receiver, String time, String message) {
+        this.code = code;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.time = time;
+        this.message = message;
     }
 
     public String getCode() {
@@ -61,17 +47,19 @@ public class Talk {
         this.receiver = receiver;
     }
 
-    public Data getData() {
-        return data;
+    public String getTime() {
+        return time;
     }
 
-    public void setData(Data data) {
-        this.data = data;
+    public void setTime(String time) {
+        this.time = time;
     }
 
-    //设置消息体
+    public String getMessage() {
+        return message;
+    }
+
     public void setMessage(String message) {
-        this.data.setMessage(message);
+        this.message = message;
     }
-
 }

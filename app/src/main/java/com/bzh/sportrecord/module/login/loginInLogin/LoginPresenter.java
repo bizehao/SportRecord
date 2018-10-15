@@ -58,8 +58,6 @@ public class LoginPresenter implements LoginContract.Presenter {
         mView.showLoading();
         String username = mView.getUsername();
         String password = mView.getPassword();
-        System.out.println(username);
-        System.out.println(password);
         DataManager dataManager = DataManager.getInstance();
         Observable<ApiLogin> observable = dataManager.login(username, password);
         dataManager.successHandler(observable, new DataManager.callBack() {

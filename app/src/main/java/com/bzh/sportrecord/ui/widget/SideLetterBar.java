@@ -16,7 +16,7 @@ import com.bzh.sportrecord.R;
  * 侧面字母选择控件
  */
 public class SideLetterBar extends View {
-    private static final String[] b = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+    private static final String[] b = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "#"};
     private int choose = -1;
     private Paint paint = new Paint();
     private boolean showBg = false;
@@ -95,7 +95,6 @@ public class SideLetterBar extends View {
         setBackgroundColor(pressBackgroundColor); //变色
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                System.out.println("按下");
                 //setBackgroundColor(pressBackgroundColor); //变色
                 showBg = true;
                 if (oldChoose != c && listener != null) {
@@ -125,7 +124,6 @@ public class SideLetterBar extends View {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                System.out.println("按上");
                 setBackgroundColor(backgroundColor); //恢复
                 showBg = false;
                 choose = -1;

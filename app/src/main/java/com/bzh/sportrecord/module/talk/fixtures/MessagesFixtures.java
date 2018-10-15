@@ -27,11 +27,15 @@ public final class MessagesFixtures extends FixturesData {
     }
 
     public static Message getTextMessage() {
+        System.out.println("[[[[[[[[[]]]]]]]]]]]]");
         return getTextMessage(getRandomMessage());
     }
 
     public static Message getTextMessage(String text) {
-        return new Message(getRandomId(), getUser(), text);
+        User user = new User("lisi","lisi","http://i.imgur.com/pv1tBmT.png" ,true);
+        //System.out.println("*******************");
+        //System.out.println(getUser());
+        return new Message(getRandomId(), user, text);
     }
 
     public static ArrayList<Message> getMessages(Date startDate) {

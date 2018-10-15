@@ -90,7 +90,7 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         Friend friend = friends.get(i);
-        viewHolder.friendName.setText(friend.getName());
+        viewHolder.friendName.setText(friend.getRemarks());
         String pic = friend.getImage();
         if(pic != null){
             //解码
@@ -112,6 +112,22 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
         } else {
             viewHolder.Initials.setVisibility(View.GONE);
         }
+
+        if (listener != null) {
+            viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.setOnClickListener(v,friend);
+                }
+            });
+            viewHolder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    listener.setOnLongClickListener(v,friend);
+                    return true;
+                }
+            });
+        }
     }
 
     @Override
@@ -128,27 +144,14 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
         private TextView Initials; //首字母
         private CircleImageView imageView; //头像
         private TextView friendName; //用户姓名
+        private LinearLayout linearLayout; //头像名称的布局
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             Initials = itemView.findViewById(R.id.friend_initials);
             imageView = itemView.findViewById(R.id.friend_icon);
             friendName = itemView.findViewById(R.id.friend_name);
-            if (listener != null) {
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        listener.setOnClickListener(v);
-                    }
-                });
-                itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        listener.setOnLongClickListener(v);
-                        return true;
-                    }
-                });
-            }
+            linearLayout = itemView.findViewById(R.id.friend_layout);
         }
     }
 
@@ -160,9 +163,9 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
     //事件接口
     public interface evenClickListener {
 
-        void setOnClickListener(View view);
+        void setOnClickListener(View view, Friend friend);
 
-        void setOnLongClickListener(View view);
+        void setOnLongClickListener(View view, Friend friend);
     }
 
 }

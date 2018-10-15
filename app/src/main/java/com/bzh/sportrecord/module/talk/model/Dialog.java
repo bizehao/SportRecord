@@ -1,13 +1,14 @@
 package com.bzh.sportrecord.module.talk.model;
 
-import com.stfalcon.chatkit.commons.models.IDialog;
+import com.bzh.chatkit.commons.models.IDialog;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /*
  * Created by troy379 on 04.04.17.
  */
-public class Dialog implements IDialog<Message> {
+public class Dialog implements IDialog<Message>,Serializable {
 
     private String id;
     private String dialogPhoto;

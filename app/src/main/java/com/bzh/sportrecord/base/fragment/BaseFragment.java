@@ -86,31 +86,26 @@ public abstract class BaseFragment extends Fragment implements BaseView {
 
     @Override
     public void showErrorMsg(String errorMsg) {
-        System.out.println("自定义错误");
         //showToast(errorMsg);
     }
 
     @Override
     public void showNormal() {
-        System.out.println("正常的显示");
         //showToast("显示正常，正常框");
     }
 
     @Override
     public void showError() {
-        System.out.println("发生错误，错误框");
         //showToast("发生错误，错误框");
     }
 
     @Override
     public void showLoading() {
-        System.out.println("开始加载框，加载框");
         //showToast("开始加载框，加载框");
     }
 
     @Override
     public void shutDownLoading() {
-        System.out.println("结束加载框，加载框");
         //showToast("结束加载框，加载框");
     }
 }

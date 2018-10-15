@@ -1,23 +1,26 @@
 package com.bzh.sportrecord.model;
 
+import java.io.Serializable;
+
 /**
  * @author 毕泽浩
  * @Description: 朋友 pojo
  * @time 2018/9/30 10:49
  */
-public class Friend {
+public class Friend implements Serializable{
 
     private String name;
-    private String image;
     private String remarks; //备注
+    private String image;
     private String pinyin; //拼音
 
     public Friend(String name) {
         this.name = name;
     }
 
-    public Friend(String name,String image, String pinyin) {
+    public Friend(String name, String remarks, String image, String pinyin) {
         this.name = name;
+        this.remarks = remarks;
         this.image = image;
         this.pinyin = pinyin;
     }

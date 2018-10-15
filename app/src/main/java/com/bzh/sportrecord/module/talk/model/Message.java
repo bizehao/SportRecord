@@ -1,7 +1,7 @@
 package com.bzh.sportrecord.module.talk.model;
 
-import com.stfalcon.chatkit.commons.models.IMessage;
-import com.stfalcon.chatkit.commons.models.MessageContentType;
+import com.bzh.chatkit.commons.models.IMessage;
+import com.bzh.chatkit.commons.models.MessageContentType;
 
 import java.util.Date;
 

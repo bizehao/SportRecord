@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -34,7 +33,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -43,25 +41,18 @@ import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.BuildConfig;
-import com.bzh.sportrecord.MainActivity;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.api.DataManager;
 import com.bzh.sportrecord.base.activity.BaseActivity;
 import com.bzh.sportrecord.module.home.homeNews.NewsFragment;
 import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.home.homeSport.SportFragment;
-import com.bzh.sportrecord.module.home.homeSport.WebSocketChatClient;
 import com.bzh.sportrecord.module.login.LoginActivity;
 import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
 import com.bzh.sportrecord.utils.CommonUtil;
 import com.bzh.sportrecord.utils.FileUtil;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -127,7 +118,6 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        System.out.println("初始化view成功");
         setSupportActionBar(mToolbar);
         View navigationHeadView = mNavigationView.getHeaderView(0);
         mCircleImageView = navigationHeadView.findViewById(R.id.user_icon);
@@ -288,17 +278,21 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     @Override
     protected void onResume() {
         super.onResume();
-        if (App.getLoginSign()) {
-            mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-            mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
-            //加载用户信息
-            mPresenter.loadData(App.getUsername());
-        } else {
-            mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
-            mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
-            Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.mipmap.no_login_user)).into(mCircleImageView);
-            mTextViewName.setText("未登录");
-            mTextViewMotto.setText("");
+        if(App.getWhetherVerify()){
+            if (App.getLoginSign()) {
+                mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+                mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
+                //加载用户信息
+                mPresenter.loadData(App.getUsername());
+                App.setWhetherVerify(false);//设置验证状态为下次不用验证
+            } else {
+                mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+                mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
+                Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.mipmap.no_login_user)).into(mCircleImageView);
+                mTextViewName.setText("未登录");
+                mTextViewMotto.setText("");
+                App.setWhetherVerify(true);
+            }
         }
     }
 
@@ -476,7 +470,6 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                 }
                 break;
             case CommonUtil.REQUEST_PICK:  //调用系统相册返回
-                System.out.println("相册相册相册相册相册相册");
                 if (resultCode == RESULT_OK) {
                     Uri uri = intent.getData();
                     gotoClipActivity(uri);
@@ -503,7 +496,6 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                         dataManager.successHandler(dataManager.uploadPng(username, body), new DataManager.callBack() {
                             @Override
                             public <T> void run(T t) {
-                                System.out.println("上传成功");
                                 mCircleImageView.setImageBitmap(bitMap);
                             }
                         });

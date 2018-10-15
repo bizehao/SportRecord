@@ -6,7 +6,7 @@ import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * @author 毕泽浩
- * @Description:
+ * @Description: 好友信息表
  * @time 2018/10/8 14:50
  */
 @Entity
