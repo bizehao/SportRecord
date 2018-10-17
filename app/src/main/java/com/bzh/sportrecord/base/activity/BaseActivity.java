@@ -13,6 +13,7 @@ import com.bzh.sportrecord.base.view.BaseView;
 import com.bzh.sportrecord.di.component.ActivityComponent;
 import com.bzh.sportrecord.di.component.DaggerActivityComponent;
 import com.bzh.sportrecord.di.module.ActivityModule;
+import com.bzh.sportrecord.utils.AppManager;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -44,6 +45,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
             initView(savedInstanceState); //初始化
             initSystemBarTint(); //状态栏
         }
+        AppManager appManager = AppManager.getAppManager();
+        appManager.addActivity(this);
     }
 
     @Override
@@ -157,7 +160,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 
     @Override
     public void showErrorMsg(String errorMsg) {
-
+        showToast(errorMsg);
     }
 
     @Override

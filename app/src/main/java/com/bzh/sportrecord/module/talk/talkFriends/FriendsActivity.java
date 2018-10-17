@@ -78,7 +78,6 @@ public class FriendsActivity extends BaseActivity {
         //请求获取所有好友信息
         DaoSession daoSession = App.getDaoSession();
         List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
-        System.out.println(list);
         for (int i = 0; i < list.size(); i++) {
             FriendsInfo friendsInfo = list.get(i);
             friends.add(new Friend(friendsInfo.getUsername(), friendsInfo.getRemarkname(), friendsInfo.getHeadportrait(), PinyinUtils.getPinYin(friendsInfo.getRemarkname())));
@@ -198,7 +197,6 @@ public class FriendsActivity extends BaseActivity {
         friends.clear();
         DaoSession daoSession = App.getDaoSession();
         List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
-        System.out.println(list);
         for (int i = 0; i < list.size(); i++) {
             FriendsInfo friendsInfo = list.get(i);
             friends.add(new Friend(friendsInfo.getName(), friendsInfo.getRemarkname(), friendsInfo.getHeadportrait(), PinyinUtils.getPinYin(friendsInfo.getRemarkname())));
@@ -211,7 +209,6 @@ public class FriendsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        System.out.println("执行了onResume");
     }
 
     //排序

@@ -38,7 +38,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".module.login.LoginActivity" />
+        <activity
+            android:name=".module.login.LoginActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".module.home.HomeActivity" />
         <activity android:name=".module.setup.SetupActivity" />
         <activity

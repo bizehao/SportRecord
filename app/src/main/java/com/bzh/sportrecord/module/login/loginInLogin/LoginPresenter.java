@@ -34,21 +34,6 @@ public class LoginPresenter implements LoginContract.Presenter {
     }
 
     @Override
-    public void attachView(LoginContract.View view) {
-
-    }
-
-    @Override
-    public void detachView() {
-
-    }
-
-    @Override
-    public int getCurrentPage() {
-        return 0;
-    }
-
-    @Override
     public void login() {
         mView.showLoading();
         String username = mView.getUsername();
@@ -59,13 +44,15 @@ public class LoginPresenter implements LoginContract.Presenter {
             @Override
             public <T> void run(T t) {
                 ApiLogin apiLogin = (ApiLogin) t;
-                System.out.println("登陆成功,跳转页面");
-                System.out.println("保存用户信息");
-                App.setUser(true,apiLogin.getData().getUsername(),apiLogin.getData().getX_Auth_Token());
-                HomeActivity.open(mContext);
-                mView.shutDownLoading();
-                LoginActivity loginActivity = (LoginActivity) mContext;
-                loginActivity.finish();
+                if(apiLogin.getCode().equals("200")){
+                    App.setUser(true,apiLogin.getData().getUsername(),apiLogin.getData().getX_Auth_Token());
+                    HomeActivity.open(mContext,true);
+                    mView.shutDownLoading();
+                    LoginActivity loginActivity = (LoginActivity) mContext;
+                    loginActivity.finish();
+                }else {
+                    mView.showErrorMsg("登录失败");
+                }
             }
         });
     }

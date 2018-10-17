@@ -36,7 +36,7 @@ public abstract class BaseFragment extends Fragment implements BaseView {
     /**
      * 界面初始化
      */
-    protected abstract void initView();
+    protected abstract void initView(Bundle savedInstanceState);
 
     @Nullable
     @Override
@@ -56,7 +56,7 @@ public abstract class BaseFragment extends Fragment implements BaseView {
                 .fragmentModule(new FragmentModule(getActivity(),this))
                 .build();
         inject();
-        initView();
+        initView(savedInstanceState);
     }
 
     /**
@@ -76,8 +76,9 @@ public abstract class BaseFragment extends Fragment implements BaseView {
      * @param desc
      */
     protected void showToast(String desc) {
+        System.out.println("登录笑死");
         if (mToast == null) {
-            mToast = Toast.makeText(this.getActivity().getApplicationContext(), desc, Toast.LENGTH_SHORT);
+            mToast = Toast.makeText(getActivity(), desc, Toast.LENGTH_SHORT);
         } else {
             mToast.setText(desc);
         }
@@ -86,6 +87,7 @@ public abstract class BaseFragment extends Fragment implements BaseView {
 
     @Override
     public void showErrorMsg(String errorMsg) {
+        showToast(errorMsg);
         //showToast(errorMsg);
     }
 

@@ -9,6 +9,8 @@ import com.bzh.sportrecord.greenDao.DaoMaster;
 import com.bzh.sportrecord.greenDao.DaoSession;
 import com.bzh.sportrecord.model.Talk;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.greenrobot.greendao.database.Database;
 
@@ -21,20 +23,18 @@ import java.util.Map;
 
 public class App extends Application {
 
+    public static final String ip = "192.168.1.196";//172.26.220.193  192.168.31.75
+
     public static AppComponent appComponent;
 
     private static WebSocketChatClient webSocketChatClient;
 
     private static DaoSession daoSession;
-
+    private static Gson gson;
     //用户
     private static User user;
 
-    private static List<Talk> list1 = new ArrayList<>(); //系统通知 100
-    private static List<Talk> list2 = new ArrayList<>(); //会话消息 200
-    private static List<Talk> list3 = new ArrayList<>(); //other 300
-    //消息集合
-    private static Map<String, List<Talk>> map;
+    private static String friend; //当前会话的朋友
 
     @Override
     public void onCreate() {
@@ -46,16 +46,23 @@ public class App extends Application {
 
         user = new User();
 
-        map = new HashMap<>();
-        map.put("100", list1);
-        map.put("200", list2);
-        map.put("300", list3);
         init();
     }
 
-    public static void connectWS(){
+    /**
+     * 获取gson实例
+     * @return
+     */
+    public static Gson getGsonInstance() {
+        if (gson == null) {
+            gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        }
+        return gson;
+    }
+
+    public static void connectWS() {
         try {
-            webSocketChatClient = new WebSocketChatClient(new URI("ws://192.168.1.196:8080"));
+            webSocketChatClient = new WebSocketChatClient(new URI("ws://" + App.ip + ":8080"));
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -76,14 +83,19 @@ public class App extends Application {
         daoSession = daoMaster.newSession();
     }
 
-    //获取消息集合
-    public static Map<String, List<Talk>> getMap() {
-        return map;
-    }
-
     //获取webSocket连接
     public static WebSocketChatClient getWebSocket() { //获取webSocket连接
         return webSocketChatClient;
+    }
+
+    //设置当前会话的朋友
+    public static void setFriend(String friend) {
+        App.friend = friend;
+    }
+
+    //获取当前会话的朋友
+    public static String getFriend() {
+        return friend;
     }
 
     /**
@@ -112,15 +124,6 @@ public class App extends Application {
         return user.loginSign;
     }
 
-    //获取是否需要验证
-    public static boolean getWhetherVerify() {
-        return user.whetherVerify;
-    }
-    //设置验证状态
-    public static void setWhetherVerify(boolean verify) {
-        user.setWhetherVerify(verify);
-    }
-
     public static String getUsername() {
         return user.username;
     }
@@ -139,17 +142,12 @@ public class App extends Application {
 
     private static class User {
         private boolean loginSign = false;
-        private boolean whetherVerify = true;
         private String username;
         private String img;
         private String token;
 
         private void setLoginSign(boolean loginSign) {
             this.loginSign = loginSign;
-        }
-
-        public void setWhetherVerify(boolean whetherVerify) {
-            this.whetherVerify = whetherVerify;
         }
 
         private void setUsername(String username) {
@@ -163,5 +161,6 @@ public class App extends Application {
         public void setImg(String img) {
             this.img = img;
         }
+
     }
 }

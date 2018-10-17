@@ -54,7 +54,7 @@ public class LoginFragment extends BaseFragment implements LoginContract.View {
     }
 
     @Override
-    protected void initView() {
+    protected void initView(Bundle savedInstanceState) {
     }
 
     @OnClick(R.id.rout_register) //跳转到注册

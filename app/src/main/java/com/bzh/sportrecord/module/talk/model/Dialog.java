@@ -67,4 +67,15 @@ public class Dialog implements IDialog<Message>,Serializable {
     public void setUnreadCount(int unreadCount) {
         this.unreadCount = unreadCount;
     }
+
+    @Override
+    public String toString() {
+        return "Dialog{" +
+                "id='" + id + '\'' +
+                ", dialogName='" + dialogName + '\'' +
+                ", users=" + users +
+                ", lastMessage=" + lastMessage +
+                ", unreadCount=" + unreadCount +
+                '}';
+    }
 }

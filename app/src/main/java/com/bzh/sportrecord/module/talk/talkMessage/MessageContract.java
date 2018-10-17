@@ -6,4 +6,5 @@ package com.bzh.sportrecord.module.talk.talkMessage;
  * @time 2018/9/29 15:39
  */
 public interface MessageContract {
+
 }

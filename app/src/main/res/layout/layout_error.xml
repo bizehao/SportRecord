@@ -21,9 +21,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
+        android:background="@drawable/fillet"
         android:gravity="center"
         android:text="@string/page_error_retry"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/button_down"
         android:textSize="13sp" />
 
 </LinearLayout>

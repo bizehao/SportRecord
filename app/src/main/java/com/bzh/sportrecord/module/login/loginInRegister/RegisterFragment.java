@@ -1,5 +1,6 @@
 package com.bzh.sportrecord.module.login.loginInRegister;
 
+import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.FragmentManager;
@@ -98,7 +99,7 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
     }
 
     @Override
-    protected void initView() {
+    protected void initView(Bundle savedInstanceState) {
         usernameText.addTextChangedListener(new ClassOfTextWatcher(usernameText, username));
         passwordText.addTextChangedListener(new ClassOfTextWatcher(passwordText, password));
         againPasswordText.addTextChangedListener(new ClassOfTextWatcher(againPasswordText, againPassword));

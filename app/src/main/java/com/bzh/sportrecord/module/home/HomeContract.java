@@ -28,6 +28,16 @@ public interface HomeContract {
          * @param motto
          */
         void setHeadMotto(String motto);
+
+        /**
+         * 登陆成功的设置
+         */
+        void successSetting();
+
+        /**
+         * 登录失败的设置
+         */
+        void failSettring();
     }
 
     interface Presenter extends BasePresenter<View> {
@@ -37,5 +47,10 @@ public interface HomeContract {
          * @param username
          */
         void loadData(String username);
+
+        /**
+         * 注销
+         */
+        void loginOut(String username);
     }
 }

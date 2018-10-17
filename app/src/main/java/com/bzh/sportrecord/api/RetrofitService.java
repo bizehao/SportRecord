@@ -1,5 +1,6 @@
 package com.bzh.sportrecord.api;
 
+import com.bzh.sportrecord.model.ApiCommon;
 import com.bzh.sportrecord.model.ApiFriends;
 import com.bzh.sportrecord.model.ApiLogin;
 import com.bzh.sportrecord.model.ApiRegister;
@@ -29,6 +30,10 @@ public interface RetrofitService {
     @POST("user/login")
     Observable<ApiLogin> login(@Field("username") String username,
                                @Field("password") String password);
+
+    //注销
+    @GET("user/login-out")
+    Observable<ApiCommon> loginOut(@Query("username") String username);
 
     //获取用户信息,搜索用户
     @GET("user/get-user-info")
@@ -63,4 +68,5 @@ public interface RetrofitService {
     @Multipart
     @POST("user/uploadPng")
     Observable<ResponseBody> uploadPng(@Part("username") RequestBody username,@Part MultipartBody.Part headPortrait);
+
 }

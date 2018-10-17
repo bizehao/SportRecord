@@ -24,7 +24,7 @@ android {
 }
 
 greendao {
-    schemaVersion 2 //当前数据库版本
+    schemaVersion 5 //当前数据库版本
     daoPackage 'com.bzh.sportrecord.greenDao'//自动生成代码所在的包名
     targetGenDir 'src/main/java'//设置自动生成代码的目录。
 }

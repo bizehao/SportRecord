@@ -1,5 +1,6 @@
 package com.bzh.sportrecord.module.home.homeNews;
 
+import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -39,7 +40,7 @@ public class NewsFragment extends BaseFragment {
     }
 
     @Override
-    protected void initView() {
+    protected void initView(Bundle savedInstanceState) {
 
     }
 

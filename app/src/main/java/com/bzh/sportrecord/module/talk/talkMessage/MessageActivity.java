@@ -7,13 +7,13 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bzh.chatkit.commons.ImageLoader;
 import com.bzh.chatkit.messages.MessageInput;
@@ -32,12 +32,16 @@ import com.bzh.sportrecord.module.talk.model.Message;
 import com.bzh.sportrecord.module.talk.model.User;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -59,19 +63,16 @@ public class MessageActivity extends BaseActivity {
     @BindView(R.id.message_toolbar)
     Toolbar mToolbar;
 
-    private static final int TOTAL_MESSAGES_COUNT = 5;
-
     protected ImageLoader imageLoader;
     protected MessagesListAdapter<Message> messagesAdapter;
     private int selectionCount;
     private Date lastLoadedDate;
-
-    private static Observer<Talk> observer; //观察者
-    private static WebSocketChatClient webSocketChatClient; //websocket
-    private Gson gson = new GsonBuilder().create(); //gson
+    private static Consumer<Talk> talkConsumer; //观察者
+    private WebSocketChatClient webSocketChatClient; //websocket
+    private Gson gson = App.getGsonInstance(); //gson
     private Bitmap mBitmap; //对方的头像图片
-    private static User receiver; //接受者(目前聊天的朋友)
-    private User sender; //发送者(当前用户)
+    private User friend; //接受者(目前聊天的朋友)
+    private User own; //发送者(当前用户)
     private DaoSession daoSession;
 
     @Override
@@ -90,12 +91,13 @@ public class MessageActivity extends BaseActivity {
         Intent intent = getIntent();
         User user = (User) intent.getSerializableExtra("user");
         mToolbar.setTitle(user.getName());
+        App.setFriend(user.getId());
         setSupportActionBar(mToolbar);
         if (mToolbar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        receiver = user;
-        sender = new User(App.getUsername(), App.getUsername(), App.getImg(), true);
+        friend = user;
+        own = new User(App.getUsername(), App.getUsername(), App.getImg(), true);
         imageLoader = new ImageLoader() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override //设置头像
@@ -118,35 +120,44 @@ public class MessageActivity extends BaseActivity {
         input.setInputListener(new MessageInput.InputListener() {//发送事件
             @Override
             public boolean onSubmit(CharSequence input) {
-                String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                Message message = new Message(id, sender, input.toString());
-                messagesAdapter.addToStart(message, true);
                 if (webSocketChatClient.isOpen()) {
-                    Talk talk = new Talk();
-                    talk.setCode("200");
-                    talk.setSender(sender.getId());
-                    talk.setReceiver(receiver.getId());
-                    talk.setMessage(input.toString());
-                    String talkJson = gson.toJson(talk, Talk.class);
-                    webSocketChatClient.send(talkJson);
+                    Observable.create(new ObservableOnSubscribe<Talk>() { //添加会话
+                        @Override
+                        public void subscribe(ObservableEmitter<Talk> emitter) throws Exception {
+                            String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
+                            Long talkID = UUID.randomUUID().getLeastSignificantBits();
+                            Date time = new Date(System.currentTimeMillis());
+                            Message message = new Message(id, own, input.toString(),time);
+                            messagesAdapter.addToStart(message, true);
+                            Talk talk = new Talk();
+                            talk.setCode("200");
+                            talk.setId(talkID);
+                            talk.setSender(own.getId());
+                            talk.setReceiver(friend.getId());
+                            talk.setMessage(input.toString());
+                            talk.setTime(time);
+                            String talkJson = gson.toJson(talk, Talk.class);
+                            webSocketChatClient.send(talkJson);
+                            emitter.onNext(talk);
+                            //自己发送的消息存入数据库
+                            System.out.println("发送"+talkID);
+                            MessageInfo messageInfo = new MessageInfo();
+                            messageInfo.setId(talkID);
+                            messageInfo.setReceiver(talk.getReceiver());
+                            messageInfo.setSender(talk.getSender());
+                            messageInfo.setTime(talk.getTime());
+                            messageInfo.setMessage(talk.getMessage());
+                            messageInfo.setReadSign(true);
+                            DaoSession daoSession = App.getDaoSession();
+                            daoSession.getMessageInfoDao().insert(messageInfo);
+                        }
+                    }).subscribe(PlanFragment.getLastMsgObserver());
                 }
                 return true;
             }
         });
-        input.setTypingListener(new MessageInput.TypingListener() {
-            @Override
-            public void onStartTyping() { //开始输入
-            }
 
-            @Override
-            public void onStopTyping() { //停止输入
-            }
-        });
-        input.setAttachmentsListener(new MessageInput.AttachmentsListener() {
-            @Override
-            public void onAddAttachments() { //点击更多按钮
-            }
-        });
+
         messagesAdapter.enableSelectionMode(new MessagesListAdapter.SelectionListener() {
             @Override
             public void onSelectionChanged(int count) { //长按信息框
@@ -156,91 +167,19 @@ public class MessageActivity extends BaseActivity {
         messagesAdapter.setLoadMoreListener(new MessagesListAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore(int page, int totalItemsCount) { //下拉加载更多
-                if (totalItemsCount < TOTAL_MESSAGES_COUNT) {
-                    loadMessages();
-                }
+                loadMessages();
+
             }
         });
-        messagesAdapter.registerViewClickListener(R.id.messageUserAvatar,
-                new MessagesListAdapter.OnMessageViewClickListener<Message>() {
-                    @Override
-                    public void onMessageViewClick(View view, Message message) {
-                        Toast.makeText(MessageActivity.this, message.getUser().getName() + " avatar click", Toast.LENGTH_SHORT).show();
-                    }
-                });
         messagesList.setAdapter(messagesAdapter);
-        observer = new Observer<Talk>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-            }
-
-            @Override
-            public void onNext(Talk talk) {
-                if (talk.getSender().equals(receiver.getId())) {
-                    String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                    Message message = new Message(id, receiver, talk.getMessage());
-                    messagesAdapter.addToStart(message, true);
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                System.out.println(e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-                System.out.println("处理完毕");
-            }
-        };
+        initUnreadMsg();//初始化未读的消息
+        initTalkConsumer();//初始化观察信息的观察者
     }
 
     public static void open(Context context, User user) {
         Intent intent = new Intent(context, MessageActivity.class);
         intent.putExtra("user", user);
         context.startActivity(intent);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        Observable.create(new ObservableOnSubscribe<ArrayList<Message>>() {
-            @Override
-            public void subscribe(ObservableEmitter<ArrayList<Message>> emitter) throws Exception {
-                ArrayList<Message> messageArrays = new ArrayList<>();
-                daoSession = App.getDaoSession();
-                MessageInfoDao messageInfoDao = daoSession.getMessageInfoDao();
-                List<MessageInfo> messageInfos = messageInfoDao.queryBuilder()
-                        .where(MessageInfoDao.Properties.Username.eq(App.getUsername()),
-                                MessageInfoDao.Properties.ReadSign.eq(false),
-                                MessageInfoDao.Properties.Sender.eq(receiver.getId()))
-                        .list();
-                if (messageInfos.size() > 0) {
-                    for (int i = 0; i < messageInfos.size(); i++) {
-                        String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                        Message message = new Message(id, receiver, messageInfos.get(i).getMessage());
-                        messageArrays.add(message);
-                    }
-                }
-                emitter.onNext(messageArrays);
-            }
-        }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ArrayList<Message>>() {
-                    @Override
-                    public void accept(ArrayList<Message> messages) throws Exception {
-                        System.out.println("执行");
-                        messagesAdapter.addToEnd(messages, true);
-                        Observable<String> observable = Observable.create(new ObservableOnSubscribe<String>() {
-                            @Override
-                            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
-                                emitter.onNext(receiver.getId());
-                            }
-                        });
-                        observable.subscribe(PlanFragment.getMsgObserver());
-                    }
-                });
     }
 
     @Override
@@ -255,7 +194,6 @@ public class MessageActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() { //监听返回按键
-        System.out.println("返回");
         if (selectionCount == 0) {
             super.onBackPressed();
         } else {
@@ -267,26 +205,98 @@ public class MessageActivity extends BaseActivity {
         new Handler().postDelayed(new Runnable() { //imitation of internet connection
             @Override
             public void run() {
-                /*ArrayList<Message> messages = MessagesFixtures.getMessages(lastLoadedDate);
-                lastLoadedDate = messages.get(messages.size() - 1).getCreatedAt();
-                messagesAdapter.addToEnd(messages, false);*/
             }
         }, 1000);
     }
 
+    //初始化的信息
+    public void initUnreadMsg() {
+        System.out.println("初始化消息");
+        Observable.create(new ObservableOnSubscribe<ArrayList<Message>>() {
+            @Override
+            public void subscribe(ObservableEmitter<ArrayList<Message>> emitter) throws Exception {
+                List<MessageInfo> messageInfos = new ArrayList<>();
+                ArrayList<Message> messageArrays = new ArrayList<>();
+                daoSession = App.getDaoSession();
+                MessageInfoDao messageInfoDao = daoSession.getMessageInfoDao();
+                List<MessageInfo> messageInfoFriend = messageInfoDao.queryBuilder()
+                        .where(MessageInfoDao.Properties.Receiver.eq(own.getId()),
+                                MessageInfoDao.Properties.Sender.eq(friend.getId()))
+                        .list();
+                List<MessageInfo> messageInfoOwn = messageInfoDao.queryBuilder()
+                        .where(MessageInfoDao.Properties.Receiver.eq(friend.getId()),
+                                MessageInfoDao.Properties.Sender.eq(own.getId()))
+                        .list();
+                messageInfos.addAll(messageInfoFriend);
+                messageInfos.addAll(messageInfoOwn);
+                Collections.sort(messageInfos, new Comparator<MessageInfo>() {
+                    @Override
+                    public int compare(MessageInfo o1, MessageInfo o2) {
+                        return o1.getTime().compareTo(o2.getTime());
+                    }
+                });
+                if (messageInfos.size() > 0) {
+                    for (int i = 0; i < messageInfos.size(); i++) {
+                        MessageInfo messageInfo = messageInfos.get(i);
+                        String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
+                        Message message;
+                        if(messageInfo.getSender().equals(friend.getId())){
+                            message = new Message(id, friend, messageInfo.getMessage(),messageInfo.getTime());
+                        }else {
+                            message = new Message(id, own, messageInfo.getMessage(),messageInfo.getTime());
+                        }
+                        messageArrays.add(message);
+                        if(!messageInfo.getReadSign()){
+                            messageInfo.setReadSign(true);
+                            messageInfoDao.update(messageInfo);
+                        }
+                    }
+                }
+                emitter.onNext(messageArrays);
+            }
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ArrayList<Message>>() {
+                    @Override
+                    public void accept(ArrayList<Message> messages) throws Exception {
+                        messagesAdapter.addToEnd(messages, true);
+                        Observable.create(new ObservableOnSubscribe<String>() {
+                            @Override
+                            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+                                emitter.onNext(friend.getId());
+                            }
+                        }).subscribe(PlanFragment.getMsgObserver());
+                    }
+                });
+    }
+
+    //初始化接收消息的观察者
+    public void initTalkConsumer() {
+        talkConsumer = new Consumer<Talk>() {
+            @Override
+            public void accept(Talk talk) throws Exception {
+                if (talk.getSender().equals(friend.getId())) {
+                    String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
+                    Message message = new Message(id, friend, talk.getMessage());
+                    messagesAdapter.addToStart(message, true);
+                    //更改读取状态
+                    DaoSession daoSession = App.getDaoSession();
+                    MessageInfo messageInfo = daoSession.getMessageInfoDao().load(talk.getId());
+                    messageInfo.setReadSign(true);
+                    daoSession.getMessageInfoDao().update(messageInfo);
+                }
+            }
+        };
+    }
+
     //获取订阅者
-    public static Observer<Talk> getObserver() {
-        return observer;
+    public static Consumer<Talk> getObserver() {
+        return talkConsumer;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        observer = null;
     }
 
-    //获取当前正在会话的用户
-    public static String getReceiver(){
-        return receiver.getId();
-    }
 }

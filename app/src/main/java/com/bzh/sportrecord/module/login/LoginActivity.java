@@ -81,6 +81,6 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        HomeActivity.open(this);
+        HomeActivity.open(this,false);
     }
 }

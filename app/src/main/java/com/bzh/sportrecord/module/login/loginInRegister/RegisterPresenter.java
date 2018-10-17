@@ -24,21 +24,6 @@ public class RegisterPresenter implements RegisterContract.Presenter {
     }
 
     @Override
-    public void attachView(RegisterContract.View view) {
-
-    }
-
-    @Override
-    public void detachView() {
-
-    }
-
-    @Override
-    public int getCurrentPage() {
-        return 0;
-    }
-
-    @Override
     public void register() {
         Map<String, String>  map = mView.getAllUserInfo();
         DataManager dataManager = DataManager.getInstance();

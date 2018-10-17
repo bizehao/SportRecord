@@ -1,5 +1,7 @@
 package com.bzh.sportrecord.model;
 
+import java.util.Date;
+
 /**
  * @author 毕泽浩
  * @Description:
@@ -7,16 +9,18 @@ package com.bzh.sportrecord.model;
  */
 public class Talk {
     private String code;
+    private Long id;
     private String sender;
     private String receiver;
-    private String time;
+    private Date time;
     private String message;
 
     public Talk() {
     }
 
-    public Talk(String code, String sender, String receiver, String time, String message) {
+    public Talk(String code, Long id, String sender, String receiver, Date time, String message) {
         this.code = code;
+        this.id = id;
         this.sender = sender;
         this.receiver = receiver;
         this.time = time;
@@ -29,6 +33,14 @@ public class Talk {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getSender() {
@@ -47,11 +59,11 @@ public class Talk {
         this.receiver = receiver;
     }
 
-    public String getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 
@@ -62,4 +74,5 @@ public class Talk {
     public void setMessage(String message) {
         this.message = message;
     }
+
 }

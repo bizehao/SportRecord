@@ -1,5 +1,6 @@
 package com.bzh.sportrecord.module.home.homeSport;
 
+import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,7 +30,7 @@ public class SportFragment extends BaseFragment {
     }
 
     @Override
-    protected void initView() {
+    protected void initView(Bundle savedInstanceState) {
 
     }
 

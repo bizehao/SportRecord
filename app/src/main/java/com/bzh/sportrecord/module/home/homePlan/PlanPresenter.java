@@ -30,26 +30,11 @@ public class PlanPresenter implements PlanContract.Presenter {
     }
 
     @Override
-    public void attachView(PlanContract.View view) {
-
-    }
-
-    @Override
-    public void detachView() {
-
-    }
-
-    @Override
-    public int getCurrentPage() {
-        return 0;
-    }
-
-    @Override
     public List<MessageInfo> getMessageInfo() {
         daoSession = App.getDaoSession();
         MessageInfoDao messageInfoDao = daoSession.getMessageInfoDao();
         List<MessageInfo> messageInfos = messageInfoDao.queryBuilder()
-                .where(MessageInfoDao.Properties.Username.eq(App.getUsername()), MessageInfoDao.Properties.ReadSign.eq(false))
+                .where(MessageInfoDao.Properties.Receiver.eq(App.getUsername()), MessageInfoDao.Properties.ReadSign.eq(false))
                 .list();
         return messageInfos;
     }

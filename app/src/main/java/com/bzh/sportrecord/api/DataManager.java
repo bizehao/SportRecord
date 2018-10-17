@@ -1,5 +1,6 @@
 package com.bzh.sportrecord.api;
 
+import com.bzh.sportrecord.model.ApiCommon;
 import com.bzh.sportrecord.model.ApiFriends;
 import com.bzh.sportrecord.model.ApiLogin;
 import com.bzh.sportrecord.model.ApiRegister;
@@ -57,6 +58,11 @@ public class DataManager implements RetrofitService {
     @Override
     public Observable<ApiLogin> login(String username, String password) {
         return mRetrofitService.login(username, password);
+    }
+
+    @Override
+    public Observable<ApiCommon> loginOut(String username) {
+        return mRetrofitService.loginOut(username);
     }
 
     @Override

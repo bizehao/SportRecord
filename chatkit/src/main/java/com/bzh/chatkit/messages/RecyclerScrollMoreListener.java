@@ -54,7 +54,6 @@ class RecyclerScrollMoreListener
         if (loadMoreListener != null) {
             int lastVisibleItemPosition = 0;
             int totalItemCount = mLayoutManager.getItemCount();
-
             if (mLayoutManager instanceof StaggeredGridLayoutManager) {
                 int[] lastVisibleItemPositions = ((StaggeredGridLayoutManager) mLayoutManager).findLastVisibleItemPositions(null);
                 lastVisibleItemPosition = getLastVisibleItem(lastVisibleItemPositions);

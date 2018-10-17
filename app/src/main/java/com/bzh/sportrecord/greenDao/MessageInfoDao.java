@@ -25,9 +25,9 @@ public class MessageInfoDao extends AbstractDao<MessageInfo, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property Username = new Property(1, String.class, "username", false, "USERNAME");
-        public final static Property Sender = new Property(2, String.class, "sender", false, "SENDER");
-        public final static Property DateTime = new Property(3, String.class, "dateTime", false, "DATE_TIME");
+        public final static Property Sender = new Property(1, String.class, "sender", false, "SENDER");
+        public final static Property Receiver = new Property(2, String.class, "receiver", false, "RECEIVER");
+        public final static Property Time = new Property(3, java.util.Date.class, "time", false, "TIME");
         public final static Property Message = new Property(4, String.class, "message", false, "MESSAGE");
         public final static Property ReadSign = new Property(5, boolean.class, "readSign", false, "READ_SIGN");
     }
@@ -45,10 +45,10 @@ public class MessageInfoDao extends AbstractDao<MessageInfo, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"MESSAGE_INFO\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"USERNAME\" TEXT," + // 1: username
-                "\"SENDER\" TEXT," + // 2: sender
-                "\"DATE_TIME\" TEXT," + // 3: dateTime
+                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"SENDER\" TEXT," + // 1: sender
+                "\"RECEIVER\" TEXT," + // 2: receiver
+                "\"TIME\" INTEGER," + // 3: time
                 "\"MESSAGE\" TEXT," + // 4: message
                 "\"READ_SIGN\" INTEGER NOT NULL );"); // 5: readSign
     }
@@ -68,19 +68,19 @@ public class MessageInfoDao extends AbstractDao<MessageInfo, Long> {
             stmt.bindLong(1, id);
         }
  
-        String username = entity.getUsername();
-        if (username != null) {
-            stmt.bindString(2, username);
-        }
- 
         String sender = entity.getSender();
         if (sender != null) {
-            stmt.bindString(3, sender);
+            stmt.bindString(2, sender);
         }
  
-        String dateTime = entity.getDateTime();
-        if (dateTime != null) {
-            stmt.bindString(4, dateTime);
+        String receiver = entity.getReceiver();
+        if (receiver != null) {
+            stmt.bindString(3, receiver);
+        }
+ 
+        java.util.Date time = entity.getTime();
+        if (time != null) {
+            stmt.bindLong(4, time.getTime());
         }
  
         String message = entity.getMessage();
@@ -99,19 +99,19 @@ public class MessageInfoDao extends AbstractDao<MessageInfo, Long> {
             stmt.bindLong(1, id);
         }
  
-        String username = entity.getUsername();
-        if (username != null) {
-            stmt.bindString(2, username);
-        }
- 
         String sender = entity.getSender();
         if (sender != null) {
-            stmt.bindString(3, sender);
+            stmt.bindString(2, sender);
         }
  
-        String dateTime = entity.getDateTime();
-        if (dateTime != null) {
-            stmt.bindString(4, dateTime);
+        String receiver = entity.getReceiver();
+        if (receiver != null) {
+            stmt.bindString(3, receiver);
+        }
+ 
+        java.util.Date time = entity.getTime();
+        if (time != null) {
+            stmt.bindLong(4, time.getTime());
         }
  
         String message = entity.getMessage();
@@ -130,9 +130,9 @@ public class MessageInfoDao extends AbstractDao<MessageInfo, Long> {
     public MessageInfo readEntity(Cursor cursor, int offset) {
         MessageInfo entity = new MessageInfo( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // username
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // sender
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // dateTime
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // sender
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // receiver
+            cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)), // time
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // message
             cursor.getShort(offset + 5) != 0 // readSign
         );
@@ -142,9 +142,9 @@ public class MessageInfoDao extends AbstractDao<MessageInfo, Long> {
     @Override
     public void readEntity(Cursor cursor, MessageInfo entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setUsername(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setSender(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
-        entity.setDateTime(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
+        entity.setSender(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setReceiver(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setTime(cursor.isNull(offset + 3) ? null : new java.util.Date(cursor.getLong(offset + 3)));
         entity.setMessage(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setReadSign(cursor.getShort(offset + 5) != 0);
      }

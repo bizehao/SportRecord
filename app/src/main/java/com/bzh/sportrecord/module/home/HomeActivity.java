@@ -50,6 +50,7 @@ import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.home.homeSport.SportFragment;
 import com.bzh.sportrecord.module.login.LoginActivity;
 import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
+import com.bzh.sportrecord.utils.AppManager;
 import com.bzh.sportrecord.utils.CommonUtil;
 import com.bzh.sportrecord.utils.FileUtil;
 
@@ -151,16 +152,11 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 Intent instant;
                 switch (menuItem.getItemId()) {
-                    case R.id.nav_login:
+                    case R.id.nav_login: //登录
                         LoginActivity.open(HomeActivity.this);
                         break;
-                    case R.id.nav_loginout:
-                        showToast("注销");
-                        loginFail();
-                        App.setLoginSign(false);
-                        instant = new Intent(HomeActivity.this, LoginActivity.class);
-                        startActivity(instant);
-                        HomeActivity.this.finish();
+                    case R.id.nav_loginout: //注销
+                        mPresenter.loginOut(App.getUsername());
                         break;
                     case R.id.nav_nocturnal_pattern:
                         showToast("夜间模式");
@@ -223,7 +219,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                     mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
                         @Override
                         public void onClick(View v) {
-                            FriendsActivity.open(HomeActivity.this);
+                            if(App.getLoginSign()){
+                                FriendsActivity.open(HomeActivity.this);
+                            }else {
+                                showToast("请您先登录");
+                            }
+
                         }
                     });
                 }
@@ -261,12 +262,19 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
             public void onTabReselected(int position) {
             }
         });
-
+        Intent intent = getIntent();
+        boolean loginSign = intent.getBooleanExtra("loginSign",false);
+        if(loginSign){
+            successSetting();
+        }else {
+            failSettring();
+        }
     }
 
     //跳转到这儿
-    public static void open(Context context){
+    public static void open(Context context,boolean loginSign){
         Intent intent = new Intent(context, HomeActivity.class);
+        intent.putExtra("loginSign",loginSign);
         context.startActivity(intent); //跳转到home页面
     }
 
@@ -278,31 +286,6 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     @Override
     protected void onResume() {
         super.onResume();
-        if(App.getWhetherVerify()){
-            if (App.getLoginSign()) {
-                loginSuccess();
-            } else {
-                loginFail();
-            }
-        }
-    }
-    //登录成功
-    public void loginSuccess(){
-        mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
-        mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
-        //加载用户信息
-        mPresenter.loadData(App.getUsername());
-        App.setWhetherVerify(false);//设置验证状态为下次不用验证
-    }
-
-    //登录失败
-    public void loginFail(){
-        mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
-        mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
-        Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.mipmap.no_login_user)).into(mCircleImageView);
-        mTextViewName.setText("未登录");
-        mTextViewMotto.setText("");
-        App.setWhetherVerify(true);
     }
 
     @Override // menu
@@ -346,6 +329,23 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     @Override
     public void setHeadMotto(String motto) {
         mTextViewMotto.setText(motto);
+    }
+
+    @Override
+    public void successSetting() {
+        mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(false);
+        mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(true);
+        //加载用户信息
+        mPresenter.loadData(App.getUsername());
+    }
+
+    @Override
+    public void failSettring() {
+        mNavigationView.getMenu().findItem(R.id.nav_login).setVisible(true);
+        mNavigationView.getMenu().findItem(R.id.nav_loginout).setVisible(false);
+        Glide.with(this).load(ContextCompat.getDrawable(getApplication(), R.mipmap.no_login_user)).into(mCircleImageView);
+        mTextViewName.setText("未登录");
+        mTextViewMotto.setText("");
     }
 
     /**
@@ -501,7 +501,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
                         // MultipartBody.Part  和后端约定好Key，这里的partName是用image
                         MultipartBody.Part body = MultipartBody.Part.createFormData("headPortrait", file.getName(), requestFile);
-                        RequestBody username = RequestBody.create(MediaType.parse("text/x-markdown"), "lisi");
+                        RequestBody username = RequestBody.create(MediaType.parse("text/x-markdown"), App.getUsername());
                         dataManager.successHandler(dataManager.uploadPng(username, body), new DataManager.callBack() {
                             @Override
                             public <T> void run(T t) {
@@ -535,6 +535,12 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        System.exit(0);
+        AppManager.getAppManager().AppExit(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        App.setLoginSign(false);
     }
 }
