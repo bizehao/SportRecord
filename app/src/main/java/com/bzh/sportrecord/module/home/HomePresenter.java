@@ -59,7 +59,6 @@ public class HomePresenter implements HomeContract.Presenter {
                 mView.setHeadName(apiUserInfo.getData().getName());
                 mView.setHeadMotto(apiUserInfo.getData().getMotto());
                 App.connectWS(); //连接 webSocket;
-                System.out.println("webSocket连接成功");
             }
         });
         Observable<ApiFriends> friends = dataManager.getFriends(username);
@@ -103,6 +102,7 @@ public class HomePresenter implements HomeContract.Presenter {
                 if((boolean)apiCommon.getData()){
                     mView.failSettring();
                     App.getWebSocket().close();
+                    System.out.println(App.getWebSocket().isOpen());
                     LoginActivity.open(mContext);
                     AppManager.getAppManager().finishActivity((Activity) mContext);
                 }

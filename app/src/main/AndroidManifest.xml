@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.bzh.sportrecord">
 
     <!-- 网络权限 -->
@@ -8,6 +9,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- 写入外部存储器 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- map -->
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"
+        tools:targetApi="eclair" />
 
     <!-- 网络权限 -->
     <!-- android:theme="@style/AppTheme" -->

@@ -1,28 +1,17 @@
 package com.bzh.sportrecord.module.talk;
 
+import android.os.Handler;
 import android.util.Log;
-
 import com.bzh.sportrecord.App;
-import com.bzh.sportrecord.greenDao.DaoSession;
+import com.bzh.sportrecord.greenDao.FriendsInfoHandler;
+import com.bzh.sportrecord.greenDao.MessageInfoHandler;
+import com.bzh.sportrecord.greenModel.FriendsInfo;
 import com.bzh.sportrecord.greenModel.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
-import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
-import com.bzh.sportrecord.module.talk.talkMessage.MessageActivity;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author 毕泽浩
@@ -35,14 +24,13 @@ public class WebSocketChatClient extends WebSocketClient {
 
     private Gson gson;
 
-    private Observable<Talk> observable;
-
     public WebSocketChatClient(URI serverUri) {
         super(serverUri);
     }
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
+        System.out.println("webSocket连接成功");
         gson = App.getGsonInstance();
         Talk talk = new Talk();
         talk.setCode("100");
@@ -55,38 +43,20 @@ public class WebSocketChatClient extends WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        Talk talk = gson.fromJson(message,Talk.class);
-        System.out.println("接收"+talk.getId());
-        //存储到数据库
-        MessageInfo messageInfo = new MessageInfo();
-        messageInfo.setId(talk.getId());
-        messageInfo.setReceiver(talk.getReceiver());
-        messageInfo.setSender(talk.getSender());
-        messageInfo.setTime(talk.getTime());
-        messageInfo.setMessage(talk.getMessage());
-        messageInfo.setReadSign(false);
-        DaoSession daoSession = App.getDaoSession();
-        daoSession.getMessageInfoDao().insert(messageInfo);
+        Talk talk = gson.fromJson(message, Talk.class);
 
-        observable = Observable.create(new ObservableOnSubscribe<Talk>() {
-            @Override
-            public void subscribe(ObservableEmitter<Talk> emitter) throws Exception {
-                emitter.onNext(talk);
-            }
-        });
-
-        switch (talk.getCode()){
+        switch (talk.getCode()) {
             case "200":
-                if(MessageActivity.getObserver() != null && App.getFriend().equals(talk.getSender())){ //消息推送(直接到消息框)
-                    observable.subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(MessageActivity.getObserver());
-                }
-                if(PlanFragment.getLastMsgObserver() != null){ //会话显示(未读条数)
-                    observable.subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(PlanFragment.getLastMsgObserver());
-                }
+                //消息存储到数据库
+                MessageInfo messageInfo = new MessageInfo(talk.getId(), talk.getSender(),
+                        talk.getReceiver(), talk.getTime(), talk.getMessage(), false);
+                MessageInfoHandler.insert(messageInfo);
+                break;
+            case "300":
+                //将头像更新数据库中
+                FriendsInfo friendsInfo = FriendsInfoHandler.selectByUsername(talk.getSender());
+                friendsInfo.setHeadportrait(talk.getMessage());
+                FriendsInfoHandler.update(friendsInfo);
                 break;
         }
 
@@ -95,12 +65,20 @@ public class WebSocketChatClient extends WebSocketClient {
     @Override
     public void onClose(int code, String reason, boolean remote) {
         Log.d(TAG, "WebSocket关闭成功");
+        WebSocketChatClient ws = App.getWebSocket();
+        if (App.getLoginSign()) {
+            new Thread(ws::reconnect).start();
+        }
     }
 
     @Override
     public void onError(Exception ex) {
         Log.d(TAG, "WebSocket链接错误");
         Log.d(TAG, "" + ex.getMessage());
+    }
+
+    public void df(){
+
     }
 
 }

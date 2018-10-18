@@ -76,7 +76,6 @@ public abstract class BaseFragment extends Fragment implements BaseView {
      * @param desc
      */
     protected void showToast(String desc) {
-        System.out.println("登录笑死");
         if (mToast == null) {
             mToast = Toast.makeText(getActivity(), desc, Toast.LENGTH_SHORT);
         } else {

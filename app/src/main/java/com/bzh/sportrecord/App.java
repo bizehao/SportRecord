@@ -7,8 +7,14 @@ import com.bzh.sportrecord.di.component.DaggerAppComponent;
 import com.bzh.sportrecord.di.module.AppModule;
 import com.bzh.sportrecord.greenDao.DaoMaster;
 import com.bzh.sportrecord.greenDao.DaoSession;
+import com.bzh.sportrecord.greenDao.FriendsInfoDao;
+import com.bzh.sportrecord.greenDao.FriendsInfoHandler;
+import com.bzh.sportrecord.greenDao.MessageInfoHandler;
+import com.bzh.sportrecord.greenModel.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
+import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
+import com.bzh.sportrecord.module.talk.talkMessage.MessageActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -21,9 +27,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 public class App extends Application {
 
-    public static final String ip = "192.168.1.196";//172.26.220.193  192.168.31.75
+    public static final String ip = "192.168.1.196";//172.26.220.193  192.168.31.75  192.168.1.196
 
     public static AppComponent appComponent;
 
@@ -35,6 +45,8 @@ public class App extends Application {
     private static User user;
 
     private static String friend; //当前会话的朋友
+
+    private Observable<MessageInfo> observable;
 
     @Override
     public void onCreate() {
@@ -81,6 +93,25 @@ public class App extends Application {
         Database db = openHelper.getWritableDb();
         DaoMaster daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
+        MessageInfoHandler.setPostProcessing(messageInfo -> {
+            observable = Observable.create(emitter -> emitter.onNext(messageInfo));
+
+            if (MessageActivity.getObserver() != null && App.getFriend().equals(messageInfo.getSender())) { //消息推送(直接到消息框)
+                observable.subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(MessageActivity.getObserver());
+            }
+            if (PlanFragment.getLastMsgObserver() != null) { //会话显示(未读条数)
+                observable.subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(PlanFragment.getLastMsgObserver());
+            }
+        });
+        MessageInfoHandler.setUpdatePostProcessing(messageInfo -> {
+            observable.subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(PlanFragment.getMsgObserver());
+        });
     }
 
     //获取webSocket连接

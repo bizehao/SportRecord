@@ -24,6 +24,7 @@ import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.activity.BaseActivity;
 import com.bzh.sportrecord.greenDao.DaoSession;
 import com.bzh.sportrecord.greenDao.MessageInfoDao;
+import com.bzh.sportrecord.greenDao.MessageInfoHandler;
 import com.bzh.sportrecord.greenModel.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
 import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
@@ -67,7 +68,7 @@ public class MessageActivity extends BaseActivity {
     protected MessagesListAdapter<Message> messagesAdapter;
     private int selectionCount;
     private Date lastLoadedDate;
-    private static Consumer<Talk> talkConsumer; //观察者
+    private static Consumer<MessageInfo> talkConsumer; //观察者
     private WebSocketChatClient webSocketChatClient; //websocket
     private Gson gson = App.getGsonInstance(); //gson
     private Bitmap mBitmap; //对方的头像图片
@@ -118,12 +119,13 @@ public class MessageActivity extends BaseActivity {
         messagesAdapter = new MessagesListAdapter<>(App.getUsername(), imageLoader);//App.getUsername()
         webSocketChatClient = App.getWebSocket();
         input.setInputListener(new MessageInput.InputListener() {//发送事件
+            @SuppressWarnings("CheckResult")
             @Override
             public boolean onSubmit(CharSequence input) {
                 if (webSocketChatClient.isOpen()) {
-                    Observable.create(new ObservableOnSubscribe<Talk>() { //添加会话
+                    Observable.create(new ObservableOnSubscribe<MessageInfo>() { //添加会话
                         @Override
-                        public void subscribe(ObservableEmitter<Talk> emitter) throws Exception {
+                        public void subscribe(ObservableEmitter<MessageInfo> emitter) throws Exception {
                             String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
                             Long talkID = UUID.randomUUID().getLeastSignificantBits();
                             Date time = new Date(System.currentTimeMillis());
@@ -138,9 +140,7 @@ public class MessageActivity extends BaseActivity {
                             talk.setTime(time);
                             String talkJson = gson.toJson(talk, Talk.class);
                             webSocketChatClient.send(talkJson);
-                            emitter.onNext(talk);
                             //自己发送的消息存入数据库
-                            System.out.println("发送"+talkID);
                             MessageInfo messageInfo = new MessageInfo();
                             messageInfo.setId(talkID);
                             messageInfo.setReceiver(talk.getReceiver());
@@ -148,8 +148,8 @@ public class MessageActivity extends BaseActivity {
                             messageInfo.setTime(talk.getTime());
                             messageInfo.setMessage(talk.getMessage());
                             messageInfo.setReadSign(true);
-                            DaoSession daoSession = App.getDaoSession();
-                            daoSession.getMessageInfoDao().insert(messageInfo);
+                            MessageInfoHandler.insert(messageInfo);
+                            emitter.onNext(messageInfo);
                         }
                     }).subscribe(PlanFragment.getLastMsgObserver());
                 }
@@ -173,7 +173,6 @@ public class MessageActivity extends BaseActivity {
         });
         messagesList.setAdapter(messagesAdapter);
         initUnreadMsg();//初始化未读的消息
-        initTalkConsumer();//初始化观察信息的观察者
     }
 
     public static void open(Context context, User user) {
@@ -210,6 +209,7 @@ public class MessageActivity extends BaseActivity {
     }
 
     //初始化的信息
+    @SuppressWarnings("CheckResult")
     public void initUnreadMsg() {
         System.out.println("初始化消息");
         Observable.create(new ObservableOnSubscribe<ArrayList<Message>>() {
@@ -248,7 +248,7 @@ public class MessageActivity extends BaseActivity {
                         messageArrays.add(message);
                         if(!messageInfo.getReadSign()){
                             messageInfo.setReadSign(true);
-                            messageInfoDao.update(messageInfo);
+                            MessageInfoHandler.updateProcessing(messageInfo);
                         }
                     }
                 }
@@ -260,43 +260,46 @@ public class MessageActivity extends BaseActivity {
                     @Override
                     public void accept(ArrayList<Message> messages) throws Exception {
                         messagesAdapter.addToEnd(messages, true);
-                        Observable.create(new ObservableOnSubscribe<String>() {
-                            @Override
-                            public void subscribe(ObservableEmitter<String> emitter) throws Exception {
-                                emitter.onNext(friend.getId());
-                            }
-                        }).subscribe(PlanFragment.getMsgObserver());
                     }
                 });
     }
 
     //初始化接收消息的观察者
     public void initTalkConsumer() {
-        talkConsumer = new Consumer<Talk>() {
+        talkConsumer = new Consumer<MessageInfo>() {
             @Override
-            public void accept(Talk talk) throws Exception {
-                if (talk.getSender().equals(friend.getId())) {
-                    String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                    Message message = new Message(id, friend, talk.getMessage());
+            public void accept(MessageInfo messageInfo) throws Exception {
+                if (messageInfo.getSender().equals(friend.getId())) {
+                    Message message = new Message(messageInfo.getId().toString(), friend, messageInfo.getMessage());
                     messagesAdapter.addToStart(message, true);
                     //更改读取状态
-                    DaoSession daoSession = App.getDaoSession();
-                    MessageInfo messageInfo = daoSession.getMessageInfoDao().load(talk.getId());
                     messageInfo.setReadSign(true);
-                    daoSession.getMessageInfoDao().update(messageInfo);
+                    MessageInfoHandler.updateProcessing(messageInfo);
                 }
             }
         };
     }
 
     //获取订阅者
-    public static Consumer<Talk> getObserver() {
+    public static Consumer<MessageInfo> getObserver() {
         return talkConsumer;
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initTalkConsumer();//初始化观察信息的观察者
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        talkConsumer = null;
+    }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
-
 }

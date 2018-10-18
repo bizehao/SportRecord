@@ -5,7 +5,9 @@ import android.content.Context;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.greenDao.DaoSession;
 import com.bzh.sportrecord.greenDao.FriendsInfoDao;
+import com.bzh.sportrecord.greenDao.FriendsInfoHandler;
 import com.bzh.sportrecord.greenDao.MessageInfoDao;
+import com.bzh.sportrecord.greenDao.MessageInfoHandler;
 import com.bzh.sportrecord.greenModel.FriendsInfo;
 import com.bzh.sportrecord.greenModel.MessageInfo;
 
@@ -31,18 +33,13 @@ public class PlanPresenter implements PlanContract.Presenter {
 
     @Override
     public List<MessageInfo> getMessageInfo() {
-        daoSession = App.getDaoSession();
-        MessageInfoDao messageInfoDao = daoSession.getMessageInfoDao();
-        List<MessageInfo> messageInfos = messageInfoDao.queryBuilder()
-                .where(MessageInfoDao.Properties.Receiver.eq(App.getUsername()), MessageInfoDao.Properties.ReadSign.eq(false))
-                .list();
-        return messageInfos;
+        return MessageInfoHandler.selectByCondition(
+                MessageInfoDao.Properties.Receiver.eq(App.getUsername()),
+                MessageInfoDao.Properties.ReadSign.eq(false));
     }
 
     @Override
     public FriendsInfo getFriendsInfo(String friendName) {
-        FriendsInfoDao friendsInfoDao = daoSession.getFriendsInfoDao();
-        FriendsInfo friendsInfo = friendsInfoDao.queryBuilder().where(FriendsInfoDao.Properties.Username.eq(friendName)).unique();
-        return friendsInfo;
+        return FriendsInfoHandler.selectByCondition(FriendsInfoDao.Properties.Username.eq(friendName));
     }
 }

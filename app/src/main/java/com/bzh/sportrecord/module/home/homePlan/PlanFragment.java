@@ -62,8 +62,8 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
     private DialogsListAdapter<Dialog> dialogsAdapter;
     private ImageLoader imageLoader;
     private Bitmap mBitmap;
-    private static Consumer<Talk> lastMsgObserver; //观察者
-    private static Consumer<String> msgCountConsumer; //消息清空观察者
+    private static Consumer<MessageInfo> lastMsgObserver; //观察者
+    private static Consumer<MessageInfo> msgCountConsumer; //消息清空观察者
     private User receiver;
     private Map<String, Dialog> dialogsMap; //存放当前用户的会话
 
@@ -185,14 +185,14 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
 
     //初始化更新或添加last消息的观察者
     public void initLastMsgObserver() {
-        lastMsgObserver = new Consumer<Talk>() {
+        lastMsgObserver = new Consumer<MessageInfo>() {
             @Override
-            public void accept(Talk talk) throws Exception {
+            public void accept(MessageInfo messageInfo) throws Exception {
                 String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                if (talk.getSender().equals(App.getUsername())) {
-                    addDialog(id, talk.getReceiver(), talk.getMessage(), talk.getTime(), true);
+                if (messageInfo.getSender().equals(App.getUsername())) {
+                    addDialog(id, messageInfo.getReceiver(), messageInfo.getMessage(), messageInfo.getTime(), true);
                 } else {
-                    addDialog(id, talk.getSender(), talk.getMessage(), talk.getTime(), false);
+                    addDialog(id, messageInfo.getSender(), messageInfo.getMessage(), messageInfo.getTime(), false);
                 }
             }
         };
@@ -200,12 +200,17 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
 
     //初始化清空未读消息条数的观察者
     public void initMsgCountObserver() {
-        msgCountConsumer = new Consumer<String>() {
+        msgCountConsumer = new Consumer<MessageInfo>() {
             @Override
-            public void accept(String name) throws Exception {
-                if (dialogsMap.containsKey(name)) {
-                    Dialog dialog = dialogsMap.get(name);
-                    dialog.setUnreadCount(0);
+            public void accept(MessageInfo messageInfo) throws Exception {
+                if (dialogsMap.containsKey(messageInfo.getSender())) {
+                    Dialog dialog = dialogsMap.get(messageInfo.getSender());
+                    int val = dialog.getUnreadCount()-1;
+                    if(val >= 0){
+                        dialog.setUnreadCount(val);
+                    }else {
+                        dialog.setUnreadCount(0);
+                    }
                     dialogsAdapter.updateItemById(dialog);
                 }
             }
@@ -213,12 +218,12 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
     }
 
     //获取更新或添加last消息的观察者
-    public static Consumer<Talk> getLastMsgObserver() {
+    public static Consumer<MessageInfo> getLastMsgObserver() {
         return lastMsgObserver;
     }
 
     //获取清空未读消息条数的观察者
-    public static Consumer<String> getMsgObserver() {
+    public static Consumer<MessageInfo> getMsgObserver() {
         return msgCountConsumer;
     }
 

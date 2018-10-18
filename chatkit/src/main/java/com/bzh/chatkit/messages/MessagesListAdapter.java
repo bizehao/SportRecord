@@ -113,6 +113,18 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
         return items.size();
     }
 
+    //获取当前的所有会话
+    @SuppressWarnings("unchecked")
+    public ArrayList<MESSAGE> getItems(){
+        ArrayList<MESSAGE> Messages = new ArrayList<>();
+        for (Wrapper wrapper : items) {
+            if (wrapper.item instanceof IMessage) {
+                Messages.add((MESSAGE) wrapper.item);
+            }
+        }
+        return Messages;
+    }
+
     @Override
     public int getItemViewType(int position) {
         return holders.getViewType(items.get(position).item, senderId);

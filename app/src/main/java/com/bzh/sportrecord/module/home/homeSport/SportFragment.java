@@ -5,6 +5,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.fragment.BaseFragment;
 
@@ -40,7 +41,8 @@ public class SportFragment extends BaseFragment {
 
     @OnClick(R.id.ws_button)
     public void buttonClick() {
-
+        App.getWebSocket().close();
+        showToast("webSocket连接被关闭");
     }
 
 }
