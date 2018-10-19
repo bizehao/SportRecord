@@ -12,8 +12,7 @@ import android.util.Log;
 import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.api.DataManager;
-import com.bzh.sportrecord.greenDao.DaoSession;
-import com.bzh.sportrecord.greenModel.FriendsInfo;
+import com.bzh.sportrecord.data.model.FriendsInfo;
 import com.bzh.sportrecord.model.ApiCommon;
 import com.bzh.sportrecord.model.ApiFriends;
 import com.bzh.sportrecord.model.ApiUserInfo;
@@ -69,8 +68,6 @@ public class HomePresenter implements HomeContract.Presenter {
                     @Override
                     public void run() {
                         ApiFriends apiUserInfo = (ApiFriends) t;
-                        DaoSession daoSession = App.getDaoSession();
-                        daoSession.getFriendsInfoDao().deleteAll();
                         //daoSession.getMessageInfoDao().deleteAll();
                         List<ApiFriends.DataBean> list = apiUserInfo.getData();
                         FriendsInfo info;
@@ -84,7 +81,6 @@ public class HomePresenter implements HomeContract.Presenter {
                             info.setHeadportrait(item.getHeadportrait());
                             info.setMotto(item.getMotto());
                             info.setRemarkname(item.getRemarkName());
-                            daoSession.getFriendsInfoDao().insert(info);
                         }
                     }
                 }).start();

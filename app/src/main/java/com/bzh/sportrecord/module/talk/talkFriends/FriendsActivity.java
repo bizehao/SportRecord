@@ -17,8 +17,7 @@ import android.widget.TextView;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.activity.BaseActivity;
-import com.bzh.sportrecord.greenDao.DaoSession;
-import com.bzh.sportrecord.greenModel.FriendsInfo;
+import com.bzh.sportrecord.data.model.FriendsInfo;
 import com.bzh.sportrecord.model.Friend;
 import com.bzh.sportrecord.module.talk.model.User;
 import com.bzh.sportrecord.module.talk.talkMessage.MessageActivity;
@@ -76,8 +75,7 @@ public class FriendsActivity extends BaseActivity {
         }
         friends = new ArrayList<>();
         //请求获取所有好友信息
-        DaoSession daoSession = App.getDaoSession();
-        List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
+        List<FriendsInfo> list = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             FriendsInfo friendsInfo = list.get(i);
             friends.add(new Friend(friendsInfo.getUsername(), friendsInfo.getRemarkname(), friendsInfo.getHeadportrait(), PinyinUtils.getPinYin(friendsInfo.getRemarkname())));
@@ -195,8 +193,7 @@ public class FriendsActivity extends BaseActivity {
     //刷新界面
     public void refresh() {
         friends.clear();
-        DaoSession daoSession = App.getDaoSession();
-        List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
+        List<FriendsInfo> list = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             FriendsInfo friendsInfo = list.get(i);
             friends.add(new Friend(friendsInfo.getName(), friendsInfo.getRemarkname(), friendsInfo.getHeadportrait(), PinyinUtils.getPinYin(friendsInfo.getRemarkname())));

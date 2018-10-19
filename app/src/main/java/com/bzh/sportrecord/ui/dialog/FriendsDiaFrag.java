@@ -16,8 +16,7 @@ import android.widget.ImageButton;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.api.DataManager;
-import com.bzh.sportrecord.greenDao.DaoSession;
-import com.bzh.sportrecord.greenModel.FriendsInfo;
+import com.bzh.sportrecord.data.model.FriendsInfo;
 import com.bzh.sportrecord.model.ApiUserInfos;
 import com.bzh.sportrecord.model.ApiaddFriends;
 import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
@@ -85,15 +84,15 @@ public class FriendsDiaFrag extends DialogFragment {
                     public <T> void run(T t) {
                         ApiUserInfos apiUserInfos = (ApiUserInfos) t;
                         List<ApiUserInfos.DataBean> dataBean = apiUserInfos.getData();
-                        DaoSession daoSession = App.getDaoSession(); //数据库获取缓存数据
-                        List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
-                        for (int i=0; i<list.size(); i++){
+                       //DaoSession daoSession = App.getDaoSession(); //数据库获取缓存数据
+                       // List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
+                        /*for (int i=0; i<list.size(); i++){
                             for(int j=0; j<dataBean.size(); j++){
                                 if(list.get(i).getUsername().equals(dataBean.get(j).getUsername())){
                                     dataBean.get(j).setExit(true);
                                 }
                             }
-                        }
+                        }*/
                         adapter.setFriends(dataBean);
                         adapter.notifyDataSetChanged();
                         loadingView.setVisibility(View.INVISIBLE);
@@ -141,8 +140,8 @@ public class FriendsDiaFrag extends DialogFragment {
                                     dataBean.getAddress(),
                                     dataBean.getMotto(),
                                     dataBean.getUsername());
-                            DaoSession daoSession = App.getDaoSession(); //数据库获取缓存数据
-                            daoSession.getFriendsInfoDao().insert(friendsInfo);//将新添加的好友缓存进数据库里
+                            //DaoSession daoSession = App.getDaoSession(); //数据库获取缓存数据
+                            //daoSession.getFriendsInfoDao().insert(friendsInfo);//将新添加的好友缓存进数据库里
                             adapter.onRefreshView(position);//动态刷新这一行数据
                             FriendsActivity df = (FriendsActivity)getActivity();
                             df.refresh(); //刷新好友界面

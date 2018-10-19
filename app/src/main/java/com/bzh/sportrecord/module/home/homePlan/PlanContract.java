@@ -2,10 +2,6 @@ package com.bzh.sportrecord.module.home.homePlan;
 
 import com.bzh.sportrecord.base.presenter.BasePresenter;
 import com.bzh.sportrecord.base.view.BaseView;
-import com.bzh.sportrecord.greenModel.FriendsInfo;
-import com.bzh.sportrecord.greenModel.MessageInfo;
-
-import java.util.List;
 
 /**
  * @author 毕泽浩
@@ -19,10 +15,10 @@ public interface PlanContract {
     }
 
     interface Presenter extends BasePresenter<View> {
-        //获取未读消息
+       /* //获取未读消息
         List<MessageInfo> getMessageInfo();
 
         //获取好友信息
-        FriendsInfo getFriendsInfo(String friendName);
+        FriendsInfo getFriendsInfo(String friendName);*/
     }
 }

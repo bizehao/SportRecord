@@ -3,14 +3,10 @@ package com.bzh.sportrecord.module.talk;
 import android.os.Handler;
 import android.util.Log;
 import com.bzh.sportrecord.App;
-import com.bzh.sportrecord.greenDao.FriendsInfoHandler;
-import com.bzh.sportrecord.greenDao.MessageInfoHandler;
-import com.bzh.sportrecord.greenModel.FriendsInfo;
-import com.bzh.sportrecord.greenModel.MessageInfo;
+import com.bzh.sportrecord.data.model.FriendsInfo;
+import com.bzh.sportrecord.data.model.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
 import com.google.gson.Gson;
-
-import org.greenrobot.eventbus.EventBus;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
@@ -51,16 +47,15 @@ public class WebSocketChatClient extends WebSocketClient {
         switch (talk.getCode()) {
             case "200":
                 //消息存储到数据库
-                MessageInfo messageInfo = new MessageInfo(talk.getId(), talk.getSender(),
+                /*MessageInfo messageInfo = new MessageInfo(talk.getId(), talk.getSender(),
                         talk.getReceiver(), talk.getTime(), talk.getMessage(), false);
-                MessageInfoHandler.insertProcessing(messageInfo);
-                //EventBus.getDefault().postSticky(talk);
+                MessageInfoHandler.insertProcessing(messageInfo);*/
                 break;
             case "300":
                 //将头像更新数据库中
-                FriendsInfo friendsInfo = FriendsInfoHandler.selectByUsername(talk.getSender());
+                /*FriendsInfo friendsInfo = FriendsInfoHandler.selectByUsername(talk.getSender());
                 friendsInfo.setHeadportrait(talk.getMessage());
-                FriendsInfoHandler.update(friendsInfo);
+                FriendsInfoHandler.update(friendsInfo);*/
                 break;
         }
 

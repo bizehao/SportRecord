@@ -19,9 +19,8 @@ import com.bzh.chatkit.dialogs.DialogsListAdapter;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.fragment.BaseFragment;
-import com.bzh.sportrecord.greenModel.FriendsInfo;
-import com.bzh.sportrecord.greenModel.MessageInfo;
-import com.bzh.sportrecord.model.Talk;
+import com.bzh.sportrecord.data.model.FriendsInfo;
+import com.bzh.sportrecord.data.model.MessageInfo;
 import com.bzh.sportrecord.module.login.LoginActivity;
 import com.bzh.sportrecord.module.talk.model.Dialog;
 import com.bzh.sportrecord.module.talk.model.Message;
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +135,7 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
             Collection<Dialog> dialogCollection = dialogsMap.values();
             dialogsAdapter.setItems(new ArrayList<>(dialogCollection));
 
-            List<MessageInfo> messageInfos = mPlanPresenter.getMessageInfo();
+            List<MessageInfo> messageInfos = new ArrayList<>();//mPlanPresenter.getMessageInfo();
             if (messageInfos.size() > 0) {
                 for (int i = 0; i < messageInfos.size(); i++) {
                     MessageInfo messageInfo = messageInfos.get(i);
@@ -249,7 +247,7 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
     public void addDialog(String id, String friendName, String messsage, Date time, boolean isOneself) {
         Dialog dialog;
         if (!dialogsMap.containsKey(friendName)) {
-            FriendsInfo friendsInfo = mPlanPresenter.getFriendsInfo(friendName);
+            FriendsInfo friendsInfo = new FriendsInfo(); //mPlanPresenter.getFriendsInfo(friendName);
             receiver = new User(friendsInfo.getUsername(), friendsInfo.getRemarkname(), friendsInfo.getHeadportrait(), true);
             ArrayList<User> users = new ArrayList<>();
             users.add(receiver);

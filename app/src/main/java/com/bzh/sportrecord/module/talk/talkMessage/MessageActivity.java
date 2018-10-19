@@ -22,10 +22,8 @@ import com.bzh.chatkit.messages.MessagesListAdapter;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.activity.BaseActivity;
-import com.bzh.sportrecord.greenDao.DaoSession;
-import com.bzh.sportrecord.greenDao.MessageInfoDao;
-import com.bzh.sportrecord.greenDao.MessageInfoHandler;
-import com.bzh.sportrecord.greenModel.MessageInfo;
+import com.bzh.sportrecord.data.dao.MessageInfoDao;
+import com.bzh.sportrecord.data.model.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
 import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
@@ -74,7 +72,6 @@ public class MessageActivity extends BaseActivity {
     private Bitmap mBitmap; //对方的头像图片
     private User friend; //接受者(目前聊天的朋友)
     private User own; //发送者(当前用户)
-    private DaoSession daoSession;
 
     @Override
     protected int getContentViewLayoutID() {
@@ -148,7 +145,6 @@ public class MessageActivity extends BaseActivity {
                             messageInfo.setTime(talk.getTime());
                             messageInfo.setMessage(talk.getMessage());
                             messageInfo.setReadSign(true);
-                            MessageInfoHandler.insert(messageInfo);
                             emitter.onNext(messageInfo);
                         }
                     }).subscribe(PlanFragment.getLastMsgObserver());
@@ -217,18 +213,8 @@ public class MessageActivity extends BaseActivity {
             public void subscribe(ObservableEmitter<ArrayList<Message>> emitter) throws Exception {
                 List<MessageInfo> messageInfos = new ArrayList<>();
                 ArrayList<Message> messageArrays = new ArrayList<>();
-                daoSession = App.getDaoSession();
-                MessageInfoDao messageInfoDao = daoSession.getMessageInfoDao();
-                List<MessageInfo> messageInfoFriend = messageInfoDao.queryBuilder()
-                        .where(MessageInfoDao.Properties.Receiver.eq(own.getId()),
-                                MessageInfoDao.Properties.Sender.eq(friend.getId()))
-                        .list();
-                List<MessageInfo> messageInfoOwn = messageInfoDao.queryBuilder()
-                        .where(MessageInfoDao.Properties.Receiver.eq(friend.getId()),
-                                MessageInfoDao.Properties.Sender.eq(own.getId()))
-                        .list();
-                messageInfos.addAll(messageInfoFriend);
-                messageInfos.addAll(messageInfoOwn);
+                messageInfos.addAll(null);
+                messageInfos.addAll(null);
                 Collections.sort(messageInfos, new Comparator<MessageInfo>() {
                     @Override
                     public int compare(MessageInfo o1, MessageInfo o2) {
@@ -246,10 +232,6 @@ public class MessageActivity extends BaseActivity {
                             message = new Message(id, own, messageInfo.getMessage(),messageInfo.getTime());
                         }
                         messageArrays.add(message);
-                        if(!messageInfo.getReadSign()){
-                            messageInfo.setReadSign(true);
-                            MessageInfoHandler.updateProcessing(messageInfo);
-                        }
                     }
                 }
                 emitter.onNext(messageArrays);
@@ -274,7 +256,6 @@ public class MessageActivity extends BaseActivity {
                     messagesAdapter.addToStart(message, true);
                     //更改读取状态
                     messageInfo.setReadSign(true);
-                    MessageInfoHandler.updateProcessing(messageInfo);
                 }
             }
         };

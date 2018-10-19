@@ -16,13 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.TextView;
-
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.api.DataManager;
-import com.bzh.sportrecord.greenDao.DaoSession;
-import com.bzh.sportrecord.greenModel.FriendsInfo;
+import com.bzh.sportrecord.data.model.FriendsInfo;
 import com.bzh.sportrecord.model.ApiUserInfos;
 import com.bzh.sportrecord.model.ApiaddFriends;
 import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
@@ -31,7 +28,6 @@ import com.bzh.sportrecord.ui.widget.LoadingView;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -129,8 +125,8 @@ public class RedFriendDiaFrag extends DialogFragment {
                                     dataBean.getAddress(),
                                     dataBean.getMotto(),
                                     dataBean.getUsername());
-                            DaoSession daoSession = App.getDaoSession(); //数据库获取缓存数据
-                            daoSession.getFriendsInfoDao().insert(friendsInfo);//将新添加的好友缓存进数据库里
+                            //DaoSession daoSession = App.getDaoSession(); //数据库获取缓存数据
+                            //daoSession.getFriendsInfoDao().insert(friendsInfo);//将新添加的好友缓存进数据库里
                             adapter.onRefreshView(position);//动态刷新这一行数据
                             FriendsActivity df = (FriendsActivity) getActivity();
                             df.refresh(); //刷新好友界面
@@ -157,8 +153,9 @@ public class RedFriendDiaFrag extends DialogFragment {
                 System.out.println("刷新获取比较");
                 ApiUserInfos apiUserInfos = (ApiUserInfos) t;
                 List<ApiUserInfos.DataBean> dataBean = apiUserInfos.getData();
-                DaoSession daoSession = App.getDaoSession(); //数据库获取缓存数据
-                List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
+                //DaoSession daoSession = App.getDaoSession(); //数据库获取缓存数据
+                //List<FriendsInfo> list = daoSession.getFriendsInfoDao().loadAll();
+                List<FriendsInfo> list = new ArrayList<>();
                 for (int i = 0; i < list.size(); i++) {
                     for (int j = 0; j < dataBean.size(); j++) {
                         if (list.get(i).getUsername().equals(dataBean.get(j).getUsername()) && !dataBean.get(j).isExit()) {

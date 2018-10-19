@@ -1,36 +1,18 @@
 package com.bzh.sportrecord;
 
 import android.app.Application;
-
+import android.arch.persistence.room.Room;
+import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.di.component.AppComponent;
 import com.bzh.sportrecord.di.component.DaggerAppComponent;
 import com.bzh.sportrecord.di.module.AppModule;
-import com.bzh.sportrecord.greenDao.DaoMaster;
-import com.bzh.sportrecord.greenDao.DaoSession;
-import com.bzh.sportrecord.greenDao.FriendsInfoDao;
-import com.bzh.sportrecord.greenDao.FriendsInfoHandler;
-import com.bzh.sportrecord.greenDao.MessageInfoHandler;
-import com.bzh.sportrecord.greenModel.FriendsInfo;
-import com.bzh.sportrecord.greenModel.MessageInfo;
-import com.bzh.sportrecord.model.Talk;
-import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
-import com.bzh.sportrecord.module.talk.talkMessage.MessageActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import org.greenrobot.greendao.database.Database;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class App extends Application {
 
@@ -40,27 +22,27 @@ public class App extends Application {
 
     private static WebSocketChatClient webSocketChatClient;
 
-    private static DaoSession daoSession;
     private static Gson gson;
     //用户
     private static User user;
 
     private static String friend; //当前会话的朋友
 
-    private Observable<MessageInfo> addMsgObservable; //消息
-    private Observable<MessageInfo> updateMsgObservable; //消息
-
     @Override
     public void onCreate() {
         super.onCreate();
+        /**
+         * 仅在Debug时初始化Timber
+         */
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
 
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .build();
 
         user = new User();
-
-        init();
     }
 
     /**
@@ -82,42 +64,6 @@ public class App extends Application {
             e.printStackTrace();
         }
         webSocketChatClient.connect();
-    }
-
-    //获取数据库操作
-    public static DaoSession getDaoSession() {
-        return daoSession;
-    }
-
-    //初始化greenDao
-    public void init() {
-        //初始化数据库
-        DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(this, "DATA_SportRecord");
-        Database db = openHelper.getWritableDb();
-        DaoMaster daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
-        MessageInfoHandler.setAddPostProcessing(messageInfo -> {
-            addMsgObservable = Observable.create(emitter -> emitter.onNext(messageInfo));
-
-            if (MessageActivity.getObserver() != null && App.getFriend().equals(messageInfo.getSender())) { //消息推送(直接到消息框)
-                addMsgObservable.subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(MessageActivity.getObserver());
-            }
-            if (PlanFragment.getLastMsgObserver() != null) { //会话显示(未读条数)
-                addMsgObservable.subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(PlanFragment.getLastMsgObserver());
-            }
-        });
-        MessageInfoHandler.setUpdatePostProcessing(messageInfo -> {
-            updateMsgObservable = Observable.create(emitter -> emitter.onNext(messageInfo));
-
-            updateMsgObservable.subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(PlanFragment.getMsgObserver());
-        });
-
     }
 
     //获取webSocket连接
