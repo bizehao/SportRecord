@@ -34,7 +34,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class App extends Application {
 
-    public static final String ip = "192.168.31.75";//172.26.220.193  192.168.31.75  192.168.1.196
+    public static final String ip = "192.168.1.196";//172.26.220.193  192.168.31.75  192.168.1.196
 
     public static AppComponent appComponent;
 
