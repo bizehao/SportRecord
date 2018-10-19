@@ -20,7 +20,7 @@ public class MessageInfoHandler {
     private static AddPostProcessing addPostProcessing;
     private static UpdatePostProcessing updatePostProcessing;
 
-    public static void setPostProcessing(AddPostProcessing addPostProcessing) {
+    public static void setAddPostProcessing(AddPostProcessing addPostProcessing) {
         MessageInfoHandler.addPostProcessing = addPostProcessing;
     }
 

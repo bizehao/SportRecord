@@ -9,6 +9,8 @@ import com.bzh.sportrecord.greenModel.FriendsInfo;
 import com.bzh.sportrecord.greenModel.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
 import com.google.gson.Gson;
+
+import org.greenrobot.eventbus.EventBus;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
@@ -44,13 +46,15 @@ public class WebSocketChatClient extends WebSocketClient {
     @Override
     public void onMessage(String message) {
         Talk talk = gson.fromJson(message, Talk.class);
-
+        System.out.println("=================");
+        System.out.println(talk);
         switch (talk.getCode()) {
             case "200":
                 //消息存储到数据库
                 MessageInfo messageInfo = new MessageInfo(talk.getId(), talk.getSender(),
                         talk.getReceiver(), talk.getTime(), talk.getMessage(), false);
-                MessageInfoHandler.insert(messageInfo);
+                MessageInfoHandler.insertProcessing(messageInfo);
+                //EventBus.getDefault().postSticky(talk);
                 break;
             case "300":
                 //将头像更新数据库中

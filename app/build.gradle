@@ -77,4 +77,6 @@ dependencies {
     implementation 'org.greenrobot:greendao:3.2.2' // add library
     //arcgis
     //implementation 'com.esri.arcgisruntime:arcgis-android:100.3.0'
+    //EventBus
+    //implementation 'org.greenrobot:eventbus:3.1.1'
 }

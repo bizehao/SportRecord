@@ -101,8 +101,8 @@ public class HomePresenter implements HomeContract.Presenter {
                 ApiCommon apiCommon = (ApiCommon) t;
                 if((boolean)apiCommon.getData()){
                     mView.failSettring();
+                    App.setLoginSign(false);
                     App.getWebSocket().close();
-                    System.out.println(App.getWebSocket().isOpen());
                     LoginActivity.open(mContext);
                     AppManager.getAppManager().finishActivity((Activity) mContext);
                 }

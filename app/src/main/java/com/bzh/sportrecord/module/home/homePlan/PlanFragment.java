@@ -33,10 +33,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.ByteArrayInputStream;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -62,7 +58,7 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
     private DialogsListAdapter<Dialog> dialogsAdapter;
     private ImageLoader imageLoader;
     private Bitmap mBitmap;
-    private static Consumer<MessageInfo> lastMsgObserver; //观察者
+    private static Consumer<MessageInfo> lastMsgObserver; //添加消息更新消息观察者
     private static Consumer<MessageInfo> msgCountConsumer; //消息清空观察者
     private User receiver;
     private Map<String, Dialog> dialogsMap; //存放当前用户的会话
@@ -85,7 +81,6 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
             dialogsMap = new LinkedHashMap<>();
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             String dialogsMapJson = sharedPreferences.getString(App.getUsername(), null);
-            System.out.println(dialogsMapJson);
             if (dialogsMapJson != null) {
                 //从本地读取列表信息
                 Gson gson = App.getGsonInstance();
@@ -94,7 +89,6 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
                 Set<Map.Entry<String, JsonElement>> entrySet = obj.entrySet();
                 for (Map.Entry<String, JsonElement> entry : entrySet) {
                     String entryKey = entry.getKey();
-                    System.out.println(entryKey);
                     JsonObject value = (JsonObject) entry.getValue();
                     dialogsMap.put(entryKey, gson.fromJson(value, Dialog.class));
                 }
@@ -152,8 +146,8 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
                 }
             }
             dialogsList.setAdapter(dialogsAdapter);
-            initLastMsgObserver();
-            initMsgCountObserver();
+            //initLastMsgObserver();
+            //initMsgCountObserver();
         } else {
             //加载出错过度页面
             mPageLayout = new PageLayout.Builder(getActivity())
@@ -176,6 +170,30 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
                     .create();
             mPageLayout.showError();
         }
+    }
+
+    /*@Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onMessageEvent(Talk talk) {
+        System.out.println("执行一次");
+        String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
+        if (talk.getSender().equals(App.getUsername())) {
+            addDialog(id, talk.getReceiver(), talk.getMessage(), talk.getTime(), true);
+        } else {
+            addDialog(id, talk.getSender(), talk.getMessage(), talk.getTime(), false);
+        }
+        EventBus.getDefault().removeStickyEvent(Talk.class);
+    }*/
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -274,7 +292,6 @@ public class PlanFragment extends BaseFragment implements PlanContract.View {
      * 保存临时数据
      */
     private void saveData() {
-        System.out.println("保存数据");
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor edit = sharedPreferences.edit();
         Gson gson = App.getGsonInstance();

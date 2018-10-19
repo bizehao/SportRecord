@@ -541,6 +541,5 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        App.setLoginSign(false);
     }
 }

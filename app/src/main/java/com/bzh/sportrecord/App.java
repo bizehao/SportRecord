@@ -10,6 +10,7 @@ import com.bzh.sportrecord.greenDao.DaoSession;
 import com.bzh.sportrecord.greenDao.FriendsInfoDao;
 import com.bzh.sportrecord.greenDao.FriendsInfoHandler;
 import com.bzh.sportrecord.greenDao.MessageInfoHandler;
+import com.bzh.sportrecord.greenModel.FriendsInfo;
 import com.bzh.sportrecord.greenModel.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
 import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
@@ -33,7 +34,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class App extends Application {
 
-    public static final String ip = "192.168.1.196";//172.26.220.193  192.168.31.75  192.168.1.196
+    public static final String ip = "192.168.31.75";//172.26.220.193  192.168.31.75  192.168.1.196
 
     public static AppComponent appComponent;
 
@@ -46,7 +47,8 @@ public class App extends Application {
 
     private static String friend; //当前会话的朋友
 
-    private Observable<MessageInfo> observable;
+    private Observable<MessageInfo> addMsgObservable; //消息
+    private Observable<MessageInfo> updateMsgObservable; //消息
 
     @Override
     public void onCreate() {
@@ -63,6 +65,7 @@ public class App extends Application {
 
     /**
      * 获取gson实例
+     *
      * @return
      */
     public static Gson getGsonInstance() {
@@ -93,25 +96,28 @@ public class App extends Application {
         Database db = openHelper.getWritableDb();
         DaoMaster daoMaster = new DaoMaster(db);
         daoSession = daoMaster.newSession();
-        MessageInfoHandler.setPostProcessing(messageInfo -> {
-            observable = Observable.create(emitter -> emitter.onNext(messageInfo));
+        MessageInfoHandler.setAddPostProcessing(messageInfo -> {
+            addMsgObservable = Observable.create(emitter -> emitter.onNext(messageInfo));
 
             if (MessageActivity.getObserver() != null && App.getFriend().equals(messageInfo.getSender())) { //消息推送(直接到消息框)
-                observable.subscribeOn(Schedulers.newThread())
+                addMsgObservable.subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(MessageActivity.getObserver());
             }
             if (PlanFragment.getLastMsgObserver() != null) { //会话显示(未读条数)
-                observable.subscribeOn(Schedulers.newThread())
+                addMsgObservable.subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(PlanFragment.getLastMsgObserver());
             }
         });
         MessageInfoHandler.setUpdatePostProcessing(messageInfo -> {
-            observable.subscribeOn(Schedulers.newThread())
+            updateMsgObservable = Observable.create(emitter -> emitter.onNext(messageInfo));
+
+            updateMsgObservable.subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(PlanFragment.getMsgObserver());
         });
+
     }
 
     //获取webSocket连接

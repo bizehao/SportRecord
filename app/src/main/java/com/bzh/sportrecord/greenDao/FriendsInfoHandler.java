@@ -16,11 +16,6 @@ import java.util.List;
 public class FriendsInfoHandler {
 
     private static FriendsInfoDao friendsInfoDao;
-    private static postProcessing postProcessing;
-
-    public static void setPostProcessing(FriendsInfoHandler.postProcessing postProcessing) {
-        postProcessing = postProcessing;
-    }
 
     //初始化
     private static void init(){
@@ -33,9 +28,6 @@ public class FriendsInfoHandler {
     public static void insert(FriendsInfo friendsInfo){
         init();
         friendsInfoDao.insert(friendsInfo);
-        /*if(postProcessing != null){
-            postProcessing.run();
-        }*/
     }
 
     //更新
@@ -57,8 +49,4 @@ public class FriendsInfoHandler {
                 .unique();
     }
 
-    //回调接口
-    private interface postProcessing{
-        void run();
-    }
 }
