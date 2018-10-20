@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.Toolbar;
@@ -22,15 +21,13 @@ import com.bzh.chatkit.messages.MessagesListAdapter;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.activity.BaseActivity;
-import com.bzh.sportrecord.data.dao.MessageInfoDao;
 import com.bzh.sportrecord.data.model.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
-import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
+import com.bzh.sportrecord.module.home.homePlan.TalkFragment;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
 import com.bzh.sportrecord.module.talk.model.Message;
 import com.bzh.sportrecord.module.talk.model.User;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -45,9 +42,7 @@ import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -114,7 +109,8 @@ public class MessageActivity extends BaseActivity {
             }
         };
         messagesAdapter = new MessagesListAdapter<>(App.getUsername(), imageLoader);//App.getUsername()
-        webSocketChatClient = App.getWebSocket();
+        App app = (App)getApplication();
+        webSocketChatClient = app.getWebSocket();
         input.setInputListener(new MessageInput.InputListener() {//发送事件
             @SuppressWarnings("CheckResult")
             @Override
@@ -147,7 +143,7 @@ public class MessageActivity extends BaseActivity {
                             messageInfo.setReadSign(true);
                             emitter.onNext(messageInfo);
                         }
-                    }).subscribe(PlanFragment.getLastMsgObserver());
+                    }).subscribe(TalkFragment.getLastMsgObserver());
                 }
                 return true;
             }

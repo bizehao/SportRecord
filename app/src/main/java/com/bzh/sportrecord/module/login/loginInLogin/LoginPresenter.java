@@ -45,8 +45,9 @@ public class LoginPresenter implements LoginContract.Presenter {
             public <T> void run(T t) {
                 ApiLogin apiLogin = (ApiLogin) t;
                 if(apiLogin.getCode().equals("200")){
-                    App.setUser(true,apiLogin.getData().getUsername(),apiLogin.getData().getX_Auth_Token());
-                    HomeActivity.open(mContext,true);
+                    App.getMainAttrs().setLoginSign(true);
+                    App.setUser(apiLogin.getData().getUsername(),apiLogin.getData().getX_Auth_Token());
+                    HomeActivity.open(mContext);
                     mView.shutDownLoading();
                     LoginActivity loginActivity = (LoginActivity) mContext;
                     loginActivity.finish();

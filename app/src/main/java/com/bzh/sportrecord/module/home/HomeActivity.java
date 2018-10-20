@@ -1,7 +1,7 @@
 package com.bzh.sportrecord.module.home;
 
 import android.Manifest;
-import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -46,7 +47,7 @@ import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.api.DataManager;
 import com.bzh.sportrecord.base.activity.BaseActivity;
 import com.bzh.sportrecord.module.home.homeNews.NewsFragment;
-import com.bzh.sportrecord.module.home.homePlan.PlanFragment;
+import com.bzh.sportrecord.module.home.homePlan.TalkFragment;
 import com.bzh.sportrecord.module.home.homeSport.SportFragment;
 import com.bzh.sportrecord.module.login.LoginActivity;
 import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
@@ -120,6 +121,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
 
     @Override
     protected void initView(Bundle savedInstanceState) {
+
         setSupportActionBar(mToolbar);
         View navigationHeadView = mNavigationView.getHeaderView(0);
         mCircleImageView = navigationHeadView.findViewById(R.id.user_icon);
@@ -140,7 +142,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
 
         fragments[0] = new SportFragment();
         fragments[1] = new NewsFragment();
-        fragments[2] = new PlanFragment();
+        fragments[2] = new TalkFragment();
         colors[0] = R.color.blue;
         colors[1] = R.color.red;
         colors[2] = R.color.colorAccent;
@@ -219,7 +221,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                     mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
                         @Override
                         public void onClick(View v) {
-                            if(App.getLoginSign()){
+                            if(App.getMainAttrs().getLoginSign().getValue()){
                                 FriendsActivity.open(HomeActivity.this);
                             }else {
                                 showToast("请您先登录");
@@ -263,19 +265,19 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
             }
         });
         Intent intent = getIntent();
-        boolean loginSign = intent.getBooleanExtra("loginSign",false);
-        if(loginSign){
-            successSetting();
-        }else {
-            failSettring();
-        }
+        App.getMainAttrs().getLoginSign().observe(this, aBoolean -> {
+            if(aBoolean != null && aBoolean){
+                successSetting();
+            }else {
+                failSettring();
+            }
+        });
     }
 
     //跳转到这儿
-    public static void open(Context context,boolean loginSign){
+    public static void open(Context context){
         Intent intent = new Intent(context, HomeActivity.class);
-        intent.putExtra("loginSign",loginSign);
-        context.startActivity(intent); //跳转到home页面
+        context.startActivity(intent);
     }
 
     @Override

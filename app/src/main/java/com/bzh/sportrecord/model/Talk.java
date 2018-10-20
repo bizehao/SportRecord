@@ -75,4 +75,15 @@ public class Talk {
         this.message = message;
     }
 
+    @Override
+    public String toString() {
+        return "Talk{" +
+                "code='" + code + '\'' +
+                ", id=" + id +
+                ", sender='" + sender + '\'' +
+                ", receiver='" + receiver + '\'' +
+                ", time=" + time +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Looper;
 import android.support.annotation.DrawableRes;
 
 import com.bzh.sportrecord.App;
@@ -35,5 +36,8 @@ public class CommonUtil {
                 resources.getResourceTypeName(id) + "/" +
                 resources.getResourceEntryName(id);
         return uriPath;
+    }
+    public void jiance(){ //判断线程
+        System.out.println("第一个"+String.valueOf(Thread.currentThread() == Looper.getMainLooper().getThread()));
     }
 }

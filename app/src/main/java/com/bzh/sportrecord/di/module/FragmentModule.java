@@ -1,11 +1,7 @@
 package com.bzh.sportrecord.di.module;
 
 import android.content.Context;
-
-import com.bzh.sportrecord.base.presenter.BasePresenter;
 import com.bzh.sportrecord.base.view.BaseView;
-import com.bzh.sportrecord.module.home.homePlan.PlanContract;
-import com.bzh.sportrecord.module.home.homePlan.PlanPresenter;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginContract;
 import com.bzh.sportrecord.module.login.loginInLogin.LoginPresenter;
 import com.bzh.sportrecord.module.login.loginInRegister.RegisterContract;
@@ -42,9 +38,4 @@ public class FragmentModule {
         return new RegisterPresenter(context, (RegisterContract.View) baseView);
     }
 
-    //通信
-    @Provides
-    PlanContract.Presenter providesPlanPresenter(){
-        return new PlanPresenter(context, (PlanContract.View) baseView);
-    }
 }

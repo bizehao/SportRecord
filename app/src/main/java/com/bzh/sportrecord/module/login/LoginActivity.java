@@ -77,10 +77,4 @@ public class LoginActivity extends BaseActivity {
         fragmentTransaction.replace(R.id.login_fragment,fragment).commit();
     }
 
-    //back键
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        HomeActivity.open(this,false);
-    }
 }

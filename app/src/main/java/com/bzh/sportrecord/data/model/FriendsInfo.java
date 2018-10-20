@@ -1,6 +1,7 @@
 package com.bzh.sportrecord.data.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
@@ -20,6 +21,7 @@ public class FriendsInfo {
     private String motto; //座右铭
     private String remarkname; //备注
 
+    @Ignore
     public FriendsInfo() {
     }
 

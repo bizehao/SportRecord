@@ -1,7 +1,10 @@
 package com.bzh.sportrecord.data.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+
+import com.bzh.sportrecord.model.Talk;
 
 import java.util.Date;
 
@@ -21,7 +24,13 @@ public class MessageInfo {
     private String message; //消息
     private boolean readSign; //读取标志
 
+    @Ignore
     public MessageInfo() {
+    }
+
+    @Ignore
+    public MessageInfo(Talk talk) {
+        this(talk.getId(),talk.getSender(),talk.getReceiver(),talk.getTime(),talk.getMessage(),false);
     }
 
     public MessageInfo(Long id, String sender, String receiver, Date time, String message, boolean readSign) {

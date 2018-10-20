@@ -5,6 +5,8 @@ import android.arch.lifecycle.ViewModel;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * @author 毕泽浩
  * @Description:
@@ -13,8 +15,6 @@ import java.util.List;
 public class HomeViewModel extends ViewModel {
     // Create a LiveData with a String
     private MutableLiveData<String> mCurrentName;
-    // Create a LiveData with a String list
-    private MutableLiveData<List<String>> mNameListData;
 
     public MutableLiveData<String> getmCurrentName() {
         if (mCurrentName == null) {
@@ -23,10 +23,15 @@ public class HomeViewModel extends ViewModel {
         return mCurrentName;
     }
 
-    public MutableLiveData<List<String>> getmNameListData() {
-        if (mNameListData == null) {
-            mNameListData = new MutableLiveData<>();
+    public void setmCurrentName(String value){
+        if(mCurrentName != null){
+            mCurrentName.setValue(value);
         }
-        return mNameListData;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+
     }
 }

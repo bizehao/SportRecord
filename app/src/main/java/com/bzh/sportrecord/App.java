@@ -1,14 +1,14 @@
 package com.bzh.sportrecord;
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
-import com.bzh.sportrecord.data.AppDatabase;
+
 import com.bzh.sportrecord.di.component.AppComponent;
 import com.bzh.sportrecord.di.component.DaggerAppComponent;
 import com.bzh.sportrecord.di.module.AppModule;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -16,17 +16,20 @@ import timber.log.Timber;
 
 public class App extends Application {
 
-    public static final String ip = "192.168.1.196";//172.26.220.193  192.168.31.75  192.168.1.196
+    public static final String ip = "192.168.31.75";//172.26.220.193  192.168.31.75  192.168.1.196
 
     public static AppComponent appComponent;
 
-    private static WebSocketChatClient webSocketChatClient;
+    private WebSocketChatClient webSocketChatClient;
 
     private static Gson gson;
     //用户
     private static User user;
 
     private static String friend; //当前会话的朋友
+
+    private static MainAttrs mainAttrs; //主要属性
+
 
     @Override
     public void onCreate() {
@@ -43,6 +46,12 @@ public class App extends Application {
                 .build();
 
         user = new User();
+
+        try {
+            webSocketChatClient = new WebSocketChatClient(this, new URI("ws://" + App.ip + ":8080"));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -57,17 +66,12 @@ public class App extends Application {
         return gson;
     }
 
-    public static void connectWS() {
-        try {
-            webSocketChatClient = new WebSocketChatClient(new URI("ws://" + App.ip + ":8080"));
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+    public void connectWS() {
         webSocketChatClient.connect();
     }
 
     //获取webSocket连接
-    public static WebSocketChatClient getWebSocket() { //获取webSocket连接
+    public WebSocketChatClient getWebSocket() { //获取webSocket连接
         return webSocketChatClient;
     }
 
@@ -81,30 +85,31 @@ public class App extends Application {
         return friend;
     }
 
+    //获取主要属性
+    public static MainAttrs getMainAttrs() {
+        if (mainAttrs == null) {
+            mainAttrs = new MainAttrs(); //初始化主要属性
+        }
+        return mainAttrs;
+    }
+
     /**
      * 设置用户信息
      *
-     * @param loginSign
      * @param username
      * @param token
      */
-    public static void setUser(boolean loginSign, String username, String token) {
-        user.setLoginSign(loginSign);
+    public static void setUser(String username, String token) {
         user.setUsername(username);
         user.setToken(token);
     }
 
     public static void setLoginSign(boolean loginSign) {
         if (!loginSign) {
-            user.setLoginSign(false);
             user.setUsername(null);
             user.setToken(null);
             user.setImg(null);
         }
-    }
-
-    public static boolean getLoginSign() {
-        return user.loginSign;
     }
 
     public static String getUsername() {
@@ -124,14 +129,9 @@ public class App extends Application {
     }
 
     private static class User {
-        private boolean loginSign = false;
         private String username;
         private String img;
         private String token;
-
-        private void setLoginSign(boolean loginSign) {
-            this.loginSign = loginSign;
-        }
 
         private void setUsername(String username) {
             this.username = username;

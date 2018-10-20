@@ -47,7 +47,7 @@ public class RetrofitHelper {
 
     private void resetApp() {
         mRetrofit = new Retrofit.Builder()
-                .baseUrl("http://"+App.ip+":8090/") //192.168.1.196:8090  215   192.168.31.75
+                .baseUrl("http://" + App.ip + ":8090/") //192.168.1.196:8090  215   192.168.31.75
                 .client(client)
                 .addConverterFactory(gsonFactory)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -64,8 +64,8 @@ public class RetrofitHelper {
         @Override
         public Response intercept(Chain chain) throws IOException {
             Request original = chain.request();
-            Request request;;
-            if (App.getLoginSign()) {
+            Request request;
+            if (App.getMainAttrs().getLoginSign().getValue() != null && App.getMainAttrs().getLoginSign().getValue()) {
                 request = original.newBuilder()
                         .header("X_Auth_Token", App.getToken())
                         //.header("Accept", "application/vnd.yourapi.v1.full+json")
@@ -76,6 +76,7 @@ public class RetrofitHelper {
                         .method(original.method(), original.body())
                         .build();
             }
+
             return chain.proceed(request);
         }
     }
