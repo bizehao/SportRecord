@@ -87,7 +87,7 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
     AppCompatButton signUp;
 
     @Inject
-    RegisterContract.Presenter mRegisterPresenter;
+    RegisterContract.Presenter mPresenter;
 
     private boolean usernameSign = true,
             passwordSign = true, againPasswordSign = true, emailSign = true, nameSign = true,
@@ -107,11 +107,6 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
         nameText.addTextChangedListener(new ClassOfTextWatcher(nameText, name));
         descriptText.addTextChangedListener(new ClassOfTextWatcher(descriptText, descript));
         addressText.addTextChangedListener(new ClassOfTextWatcher(addressText, address));
-    }
-
-    @Override
-    protected void inject() {
-        fragmentComponent.inject(this);
     }
 
     @OnClick(R.id.register_return) //跳转到登录页面
@@ -165,7 +160,7 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
             }
         }
         if (usernameSign && passwordSign && againPasswordSign && emailSign && nameSign && descriptSign && addressSign && mottoSign) {
-            mRegisterPresenter.register();
+            mPresenter.register();
         }
 
     }
@@ -330,5 +325,17 @@ public class RegisterFragment extends BaseFragment implements RegisterContract.V
     @Override
     public void showErrorMsg(String errorMsg) {
         CustomDiaFrag.newInstance("提示",errorMsg).show(getFragmentManager(), getTag());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPresenter.takeView(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.dropView();
     }
 }

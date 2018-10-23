@@ -150,6 +150,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
             if (items.get(i).getId().equals(id)) {
                 items.remove(i);
                 notifyItemRemoved(i);
+
             }
         }
     }
@@ -842,6 +843,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
                 public void onClick(View v) {
                     if (onSlidingMenuClickListener != null) {
                         onSlidingMenuClickListener.onDeleteClick(dialog);
+                        slidingMenu.closeMenu();
                     }
                 }
             });

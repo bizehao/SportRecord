@@ -1,5 +1,6 @@
 package com.bzh.sportrecord.ui.adapter;
 
+import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.R;
+import com.bzh.sportrecord.data.model.FriendsInfo;
 import com.bzh.sportrecord.model.Friend;
 import com.bzh.sportrecord.utils.CommonUtil;
 import com.bzh.sportrecord.utils.PinyinUtils;
@@ -29,6 +31,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,7 +40,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * @author 毕泽浩
- * @Description:
+ * @Description: 好友列表适配器
  * @time 2018/9/30 10:47
  */
 public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecycleViewAdapter.ViewHolder> {
@@ -47,24 +51,33 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
 
     private HashMap<String, Integer> letterIndexes = new HashMap<>();//字母不一样的map集合
 
-    public FriendsRecycleViewAdapter(Context context, List<Friend> friends) {
-        this.friends = friends;
+    public FriendsRecycleViewAdapter(Context context, List<FriendsInfo> friendsInfos) {
         this.context = context;
-        setFriends(friends);
+        setFriends(friendsInfos);
     }
 
-    public void setFriends(List<Friend> friends) {
-        this.friends = friends;
-
-        for (int i = 0; i < friends.size(); i++) {
-            //当前城市拼音首字母
-            String currentLetter = PinyinUtils.getFirstLetter(friends.get(i).getPinyin());
-            //上个首字母，如果不存在设为""
-            String previousLetter = i >= 1 ? PinyinUtils.getFirstLetter(friends.get(i - 1).getPinyin()) : "";
-            if (!TextUtils.equals(currentLetter, previousLetter)) {
-                letterIndexes.put(currentLetter, i);
+    public void setFriends(List<FriendsInfo> friendsInfos) {
+        List<Friend> friends = new ArrayList<>();
+        if (friendsInfos != null) {
+            for (int i = 0; i < friendsInfos.size(); i++) {
+                FriendsInfo friendsInfo = friendsInfos.get(i);
+                friends.add(new Friend(friendsInfo.getUsername(),
+                        friendsInfo.getRemarkname(),
+                        friendsInfo.getHeadportrait(),
+                        PinyinUtils.getPinYin(friendsInfo.getRemarkname())));
+            }
+            sort(friends);
+            for (int i = 0; i < friends.size(); i++) {
+                //当前城市拼音首字母
+                String currentLetter = PinyinUtils.getFirstLetter(friends.get(i).getPinyin());
+                //上个首字母，如果不存在设为""
+                String previousLetter = i >= 1 ? PinyinUtils.getFirstLetter(friends.get(i - 1).getPinyin()) : "";
+                if (!TextUtils.equals(currentLetter, previousLetter)) {
+                    letterIndexes.put(currentLetter, i);
+                }
             }
         }
+        this.friends = friends;
     }
 
     /**
@@ -92,16 +105,16 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
         Friend friend = friends.get(i);
         viewHolder.friendName.setText(friend.getRemarks());
         String pic = friend.getImage();
-        if(pic != null){
+        if (pic != null) {
             //解码
             Base64.Decoder decoder = Base64.getDecoder();
             byte[] bytes = decoder.decode(friend.getImage());
             //Bitmap bitMap = BitmapFactory.decodeStream(new ByteArrayInputStream(bytes));
-            Bitmap bitMap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+            Bitmap bitMap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             //viewHolder.imageView.setImageBitmap(bitMap);
             //BitmapDrawable bd= new BitmapDrawable(context.getResources(), bitMap);
             Glide.with(context).load(bitMap).into(viewHolder.imageView);
-        }else {
+        } else {
             Glide.with(context).load(R.drawable.user_icon).into(viewHolder.imageView);
         }
         String currentLetter = PinyinUtils.getFirstLetter(friend.getPinyin());
@@ -117,13 +130,13 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
             viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.setOnClickListener(v,friend);
+                    listener.setOnClickListener(v, friend);
                 }
             });
             viewHolder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    listener.setOnLongClickListener(v,friend);
+                    listener.setOnLongClickListener(v, friend);
                     return true;
                 }
             });
@@ -132,9 +145,9 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
 
     @Override
     public int getItemCount() {
-        if(friends != null){
+        if (friends != null) {
             return friends.size();
-        }else {
+        } else {
             return 0;
         }
     }
@@ -166,6 +179,25 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
         void setOnClickListener(View view, Friend friend);
 
         void setOnLongClickListener(View view, Friend friend);
+    }
+
+    //排序
+    public void sort(List<Friend> friends) {
+        List<Friend> f1 = new ArrayList<>(); //字母集合
+        List<Friend> f2 = new ArrayList<>(); //数组集合
+        for (Friend friend : friends) {
+            char py = friend.getPinyin().charAt(0);
+            if ((py >= 'a' && py <= 'z') || (py >= 'A' && py <= 'Z')) {
+                f1.add(friend);
+            } else {
+                f2.add(friend);
+            }
+        }
+        Collections.sort(f1);
+        Collections.sort(f2);
+        friends.clear();
+        friends.addAll(f1);
+        friends.addAll(f2);
     }
 
 }

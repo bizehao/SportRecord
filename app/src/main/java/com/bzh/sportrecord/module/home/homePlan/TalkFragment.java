@@ -21,6 +21,7 @@ import com.bzh.chatkit.commons.ImageLoader;
 import com.bzh.chatkit.dialogs.DialogsList;
 import com.bzh.chatkit.dialogs.DialogsListAdapter;
 import com.bzh.sportrecord.App;
+import com.bzh.sportrecord.MainAttrs;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.fragment.BaseFragment;
 import com.bzh.sportrecord.data.AppDatabase;
@@ -28,6 +29,7 @@ import com.bzh.sportrecord.data.model.FriendsInfo;
 import com.bzh.sportrecord.data.model.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
 import com.bzh.sportrecord.module.login.LoginActivity;
+import com.bzh.sportrecord.module.talk.WebSocketChatClient;
 import com.bzh.sportrecord.module.talk.model.Dialog;
 import com.bzh.sportrecord.module.talk.model.Message;
 import com.bzh.sportrecord.module.talk.model.User;
@@ -49,6 +51,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -63,29 +67,29 @@ public class TalkFragment extends BaseFragment {
     DialogsList dialogsList;
     @BindView(R.id.is_online)
     FrameLayout mFrameLayout;
-
+    @Inject
+    WebSocketChatClient webSocketChatClient;
+    @Inject
+    Gson gson;
+    @Inject
+    MainAttrs mainAttrs;
     private DialogsListAdapter<Dialog> dialogsAdapter;
     private ImageLoader imageLoader;
     private Bitmap mBitmap;
-    private static Consumer<MessageInfo> lastMsgObserver; //添加消息更新消息观察者
-    private static Consumer<MessageInfo> msgCountConsumer; //消息清空观察者
     private User receiver;
-    private Map<String, Dialog> dialogsMap; //存放当前用户的会话
+    private Map<String, Dialog> dialogsMap = new LinkedHashMap<>();
+    //存放当前用户的会话
     private TalkViewModel mTalkViewModel;
     private PageLayout mPageLayout;
+
+    @Inject
+    public TalkFragment() {
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTalkViewModel = ViewModelProviders.of(this).get(TalkViewModel.class);
-        mTalkViewModel.getMessageInfoLiveData().observe(this, messageInfo -> {
-            String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-            if (messageInfo.getSender().equals(App.getUsername())) {
-                addDialog(id, messageInfo.getReceiver(), messageInfo.getMessage(), messageInfo.getTime(), true);
-            } else {
-                addDialog(id, messageInfo.getSender(), messageInfo.getMessage(), messageInfo.getTime(), false);
-            }
-        });
     }
 
     @Override
@@ -94,13 +98,8 @@ public class TalkFragment extends BaseFragment {
     }
 
     @Override
-    protected void inject() {
-        fragmentComponent.inject(this);
-    }
-
-    @Override
     protected void initView(Bundle savedInstanceState) {
-        App.getMainAttrs().getLoginSign().observe(this, new Observer<Boolean>() {
+        mainAttrs.getLoginSign().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
                 if (aBoolean != null && aBoolean) {
@@ -112,27 +111,34 @@ public class TalkFragment extends BaseFragment {
         });
     }
 
-    /*@Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void onMessageEvent(Talk talk) {
-        System.out.println("执行一次");
-        String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-        if (talk.getSender().equals(App.getUsername())) {
-            addDialog(id, talk.getReceiver(), talk.getMessage(), talk.getTime(), true);
-        } else {
-            addDialog(id, talk.getSender(), talk.getMessage(), talk.getTime(), false);
-        }
-        EventBus.getDefault().removeStickyEvent(Talk.class);
-    }*/
-
     //在线的处理
     public void online() {
         if (mPageLayout != null) {
             mPageLayout.hide();
         }
-        dialogsMap = new LinkedHashMap<>();
+        mTalkViewModel.getMessageInfos().observe(this, messageInfos -> {
+            if (messageInfos.size() > 0) {
+                for (int i = 0; i < messageInfos.size(); i++) {
+                    addDialog(messageInfos.get(i));
+                }
+            }
+        });
+        mTalkViewModel.getMessageInfoLiveData().observe(this, messageInfo -> {
+            addDialog(messageInfo);
+        });
+        mainAttrs.getClearZeroName().observe(this, s -> {
+            Dialog dialog = dialogsMap.get(s);
+            if (dialog != null && dialog.getUnreadCount() != 0) {
+                dialog.setUnreadCount(0);
+                dialogsAdapter.updateItemById(dialog);
+            }
+        });
+        mainAttrs.getOwnSendMsg().observe(this, messageInfo -> {
+            addDialogOfOwn(messageInfo);
+        });
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String dialogsMapJson = sharedPreferences.getString(App.getUsername(), null);
-        if (dialogsMapJson != null) {
+        /*if (dialogsMapJson != null) {
             //从本地读取列表信息
             Gson gson = App.getGsonInstance();
             dialogsMap = new LinkedHashMap<>();
@@ -143,7 +149,7 @@ public class TalkFragment extends BaseFragment {
                 JsonObject value = (JsonObject) entry.getValue();
                 dialogsMap.put(entryKey, gson.fromJson(value, Dialog.class));
             }
-        }
+        }*/
         imageLoader = new ImageLoader() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -183,23 +189,24 @@ public class TalkFragment extends BaseFragment {
             @Override
             public void onDeleteClick(Dialog dialog) { //删除某一项
                 dialogsAdapter.deleteById(dialog.getId());
+                dialogsMap.remove(dialog.getUsers().get(0).getId());
             }
         });
-        Collection<Dialog> dialogCollection = dialogsMap.values();
-        dialogsAdapter.setItems(new ArrayList<>(dialogCollection));
+        //Collection<Dialog> dialogCollection = dialogsMap.values();
+        //dialogsAdapter.setItems(new ArrayList<>(dialogCollection));
 
         List<MessageInfo> messageInfos = new ArrayList<>();//mPlanPresenter.getMessageInfo();
         if (messageInfos.size() > 0) {
             for (int i = 0; i < messageInfos.size(); i++) {
                 MessageInfo messageInfo = messageInfos.get(i);
                 String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                addDialog(id, messageInfo.getSender(), messageInfo.getMessage(), messageInfo.getTime(), false);
+                //addDialog(id, messageInfo.getSender(), messageInfo.getMessage(), messageInfo.getTime(), false);
             }
         }
         dialogsList.setAdapter(dialogsAdapter);
         App app = (App) getActivity().getApplication();
-        app.getWebSocket().setDialogHandler(talk -> {
-            mTalkViewModel.setMessageInfoLiveData(new MessageInfo(talk));
+        webSocketChatClient.setDialogHandler(talk -> {
+            mTalkViewModel.setMessageInfoLiveData(new MessageInfo(talk, false));
         });
     }
 
@@ -219,67 +226,25 @@ public class TalkFragment extends BaseFragment {
         mPageLayout.showError();
     }
 
-    //初始化更新或添加last消息的观察者
-    public void initLastMsgObserver() {
-        lastMsgObserver = new Consumer<MessageInfo>() {
-            @Override
-            public void accept(MessageInfo messageInfo) throws Exception {
-                String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                if (messageInfo.getSender().equals(App.getUsername())) {
-                    addDialog(id, messageInfo.getReceiver(), messageInfo.getMessage(), messageInfo.getTime(), true);
-                } else {
-                    addDialog(id, messageInfo.getSender(), messageInfo.getMessage(), messageInfo.getTime(), false);
-                }
-            }
-        };
-    }
-
-    //初始化清空未读消息条数的观察者
-    public void initMsgCountObserver() {
-        msgCountConsumer = new Consumer<MessageInfo>() {
-            @Override
-            public void accept(MessageInfo messageInfo) throws Exception {
-                if (dialogsMap.containsKey(messageInfo.getSender())) {
-                    Dialog dialog = dialogsMap.get(messageInfo.getSender());
-                    int val = dialog.getUnreadCount() - 1;
-                    if (val >= 0) {
-                        dialog.setUnreadCount(val);
-                    } else {
-                        dialog.setUnreadCount(0);
-                    }
-                    dialogsAdapter.updateItemById(dialog);
-                }
-            }
-        };
-    }
-
-    //获取更新或添加last消息的观察者
-    public static Consumer<MessageInfo> getLastMsgObserver() {
-        return lastMsgObserver;
-    }
-
-    //获取清空未读消息条数的观察者
-    public static Consumer<MessageInfo> getMsgObserver() {
-        return msgCountConsumer;
-    }
-
-    //添加会话
+    //添加会话多个
     @SuppressWarnings("CheckResult")
-    public void addDialog(String id, String friendName, String messsage, Date time, boolean isOneself) {
-        if (!dialogsMap.containsKey(friendName)) {
+    public void addDialog(MessageInfo messageInfo) {
+        if (!dialogsMap.containsKey(messageInfo.getSender())) {
             Observable.create((ObservableOnSubscribe<Dialog>) emitter -> {
-                Dialog dialog;
-                FriendsInfo friendsInfo = new FriendsInfo(); //mPlanPresenter.getFriendsInfo(friendName);
+                String id = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
+                FriendsInfo friendsInfo = AppDatabase.getAppDatabase().friendsInfoDao().findByUsername(messageInfo.getSender());
                 receiver = new User(friendsInfo.getUsername(), friendsInfo.getRemarkname(), friendsInfo.getHeadportrait(), true);
                 ArrayList<User> users = new ArrayList<>();
                 users.add(receiver);
-                Message message = new Message(id, receiver, messsage, time);
-                if (isOneself) {
+                Message message = new Message(messageInfo.getId().toString(), receiver, messageInfo.getMessage(), messageInfo.getTime());
+                Dialog dialog;
+                if (App.getFriend() != null && App.getFriend().equals(messageInfo.getSender())) {
                     dialog = new Dialog(id, receiver.getName(), receiver.getAvatar(), users, message, 0);
                 } else {
-                    dialog = new Dialog(id, receiver.getName(), receiver.getAvatar(), users, message, 1);
+                    int count = messageInfo.getCount() == 0 ? 1 : messageInfo.getCount();
+                    dialog = new Dialog(id, receiver.getName(), receiver.getAvatar(), users, message, count);
                 }
-                dialogsMap.put(friendName, dialog);
+                dialogsMap.put(friendsInfo.getUsername(), dialog);
                 emitter.onNext(dialog);
             }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(dialog -> {
                 dialogsAdapter.addItem(dialog);
@@ -288,18 +253,53 @@ public class TalkFragment extends BaseFragment {
             });
         } else {
             Observable.create((ObservableOnSubscribe<Dialog>) emitter -> {
-                Dialog dialog = dialogsMap.get(friendName);
-                if (isOneself) {
-                    dialog.setUnreadCount(dialog.getUnreadCount());
+                Dialog dialog = dialogsMap.get(messageInfo.getSender());
+                if (App.getFriend() != null && App.getFriend().equals(messageInfo.getSender())) {
+                    dialog.setUnreadCount(0);
                 } else {
                     dialog.setUnreadCount(dialog.getUnreadCount() + 1);
                 }
                 Message message = dialog.getLastMessage();
-                message.setText(messsage);
-                message.setCreatedAt(time);
+                message.setText(messageInfo.getMessage());
+                message.setCreatedAt(messageInfo.getTime());
                 emitter.onNext(dialog);
             }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(dialog -> {
-                System.out.println(dialog);
+                dialogsAdapter.updateItemById(dialog);
+                int position = dialogsAdapter.getDialogPosition(dialog);
+                dialogsAdapter.moveItem(position, 0);
+            });
+        }
+    }
+
+    //添加会话自己发送
+    @SuppressWarnings("CheckResult")
+    public void addDialogOfOwn(MessageInfo messageInfo) {
+        if (!dialogsMap.containsKey(messageInfo.getReceiver())) {
+            Observable.create((ObservableOnSubscribe<Dialog>) emitter -> {
+                String id = String.valueOf(UUID.randomUUID().getLeastSignificantBits());
+                FriendsInfo friendsInfo = AppDatabase.getAppDatabase().friendsInfoDao().findByUsername(messageInfo.getReceiver());
+                receiver = new User(friendsInfo.getUsername(), friendsInfo.getRemarkname(), friendsInfo.getHeadportrait(), true);
+                ArrayList<User> users = new ArrayList<>();
+                users.add(receiver);
+                Message message = new Message(messageInfo.getId().toString(), receiver, messageInfo.getMessage(), messageInfo.getTime());
+                Dialog dialog = new Dialog(id, receiver.getName(), receiver.getAvatar(), users, message, 0);
+                ;
+                dialogsMap.put(friendsInfo.getUsername(), dialog);
+                emitter.onNext(dialog);
+            }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(dialog -> {
+                dialogsAdapter.addItem(dialog);
+                int position = dialogsAdapter.getDialogPosition(dialog);
+                dialogsAdapter.moveItem(position, 0);
+            });
+        } else {
+            Observable.create((ObservableOnSubscribe<Dialog>) emitter -> {
+                Dialog dialog = dialogsMap.get(messageInfo.getReceiver());
+                dialog.setUnreadCount(0);
+                Message message = dialog.getLastMessage();
+                message.setText(messageInfo.getMessage());
+                message.setCreatedAt(messageInfo.getTime());
+                emitter.onNext(dialog);
+            }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(dialog -> {
                 dialogsAdapter.updateItemById(dialog);
                 int position = dialogsAdapter.getDialogPosition(dialog);
                 dialogsAdapter.moveItem(position, 0);
@@ -324,7 +324,6 @@ public class TalkFragment extends BaseFragment {
     private void saveData() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor edit = sharedPreferences.edit();
-        Gson gson = App.getGsonInstance();
         List<Dialog> dialogs = dialogsAdapter.getItems();
         Map<String, Dialog> dialogMap = new LinkedHashMap<>();
         for (Dialog dialog : dialogs) {

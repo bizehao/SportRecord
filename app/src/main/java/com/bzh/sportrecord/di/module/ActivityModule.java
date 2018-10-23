@@ -1,29 +1,33 @@
 package com.bzh.sportrecord.di.module;
 
-import android.content.Context;
+import android.app.Activity;
 
-import com.bzh.sportrecord.base.presenter.BasePresenter;
-import com.bzh.sportrecord.base.view.BaseView;
-import com.bzh.sportrecord.module.home.HomeContract;
-import com.bzh.sportrecord.module.home.HomePresenter;
+import com.bzh.sportrecord.MainActivity;
+import com.bzh.sportrecord.module.home.HomeActivity;
+import com.bzh.sportrecord.module.login.LoginActivity;
+import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
+import com.bzh.sportrecord.module.talk.talkFriends.RedFriendDiaFrag;
+import com.bzh.sportrecord.module.talk.talkMessage.MessageActivity;
 
 import dagger.Module;
-import dagger.Provides;
+import dagger.android.ContributesAndroidInjector;
 
 @Module
-public class ActivityModule {
-
-    private Context context;
-    private BaseView baseView;
-
-    public ActivityModule(Context context, BaseView baseView){
-        this.context = context;
-        this.baseView = baseView;
-    }
+public abstract class ActivityModule {
 
     //主页
-    @Provides
-    HomeContract.Presenter providesHomePresenter(){
-        return new HomePresenter(context, (HomeContract.View) baseView);
-    }
+    @ContributesAndroidInjector(modules = HomeModule.class)
+    abstract HomeActivity providesHomeActivity();
+
+    @ContributesAndroidInjector(modules = LoginModule.class)
+    abstract LoginActivity providesLoginActivity();
+
+    @ContributesAndroidInjector(modules = FriendsModule.class)
+    abstract FriendsActivity providesFriendsActivity();
+
+    @ContributesAndroidInjector
+    abstract MessageActivity providesMessageActivity();
+
+    @ContributesAndroidInjector
+    abstract MainActivity providesMainActivity();
 }

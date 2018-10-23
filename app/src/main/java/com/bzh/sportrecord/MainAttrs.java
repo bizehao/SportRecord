@@ -3,6 +3,8 @@ package com.bzh.sportrecord;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
+import com.bzh.sportrecord.data.model.MessageInfo;
+
 /**
  * @author 毕泽浩
  * @Description:
@@ -14,19 +16,50 @@ public class MainAttrs {
 
     private MutableLiveData<Boolean> networkSign; //网络状态
 
-    public MutableLiveData<Boolean> getLoginSign() {
-        if(loginSign == null){
+    private MutableLiveData<String> clearZeroName; //需要清零的
+
+    private MutableLiveData<MessageInfo> ownSendMsg; //自己发送的消息
+
+    public MainAttrs() {
+        if (loginSign == null) {
             loginSign = new MutableLiveData<>();
             loginSign.setValue(false);
         }
+        if (networkSign == null) {
+            networkSign = new MutableLiveData<>();
+        }
+        if(clearZeroName == null){
+            clearZeroName = new MutableLiveData<>();
+        }
+        if(ownSendMsg == null){
+            ownSendMsg = new MutableLiveData<>();
+        }
+    }
+
+    public LiveData<Boolean> getLoginSign() {
+
         return loginSign;
     }
 
-    public MutableLiveData<Boolean> getNetworkSign() {
-        if(networkSign == null){
-            networkSign = new MutableLiveData<>();
-        }
+    public LiveData<Boolean> getNetworkSign() {
+
         return networkSign;
+    }
+
+    public LiveData<String> getClearZeroName() {
+        return clearZeroName;
+    }
+
+    public LiveData<MessageInfo> getOwnSendMsg() {
+        return ownSendMsg;
+    }
+
+    public void setOwnSendMsg(MessageInfo ownSendMsg) {
+        this.ownSendMsg.postValue(ownSendMsg);
+    }
+
+    public void setClearZeroName(String clearZeroName) {
+        this.clearZeroName.postValue(clearZeroName);
     }
 
     public void setLoginSign(boolean loginSign) {
@@ -34,6 +67,6 @@ public class MainAttrs {
     }
 
     public void setNetworkSign(boolean networkSign) {
-        this.networkSign.setValue(networkSign);
+        this.networkSign.postValue(networkSign);
     }
 }

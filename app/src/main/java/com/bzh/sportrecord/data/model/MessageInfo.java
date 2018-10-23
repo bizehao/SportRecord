@@ -3,6 +3,7 @@ package com.bzh.sportrecord.data.model;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.icu.text.SimpleDateFormat;
 
 import com.bzh.sportrecord.model.Talk;
 
@@ -23,14 +24,15 @@ public class MessageInfo {
     private Date time; //日期
     private String message; //消息
     private boolean readSign; //读取标志
+    private int count; //未读条数
 
     @Ignore
     public MessageInfo() {
     }
 
     @Ignore
-    public MessageInfo(Talk talk) {
-        this(talk.getId(),talk.getSender(),talk.getReceiver(),talk.getTime(),talk.getMessage(),false);
+    public MessageInfo(Talk talk,boolean state) {
+        this(talk.getId(),talk.getSender(),talk.getReceiver(),talk.getTime(),talk.getMessage(),state);
     }
 
     public MessageInfo(Long id, String sender, String receiver, Date time, String message, boolean readSign) {
@@ -89,4 +91,25 @@ public class MessageInfo {
     public void setReadSign(boolean readSign) {
         this.readSign = readSign;
     }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    @Override
+    public String toString() {
+        return "MessageInfo{" +
+                ", sender='" + sender + '\'' +
+                ", receiver='" + receiver + '\'' +
+                ", time=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(time) +
+                ", message='" + message + '\'' +
+                ", readSign=" + readSign +
+                ", count=" + count +
+                '}';
+    }
+
 }

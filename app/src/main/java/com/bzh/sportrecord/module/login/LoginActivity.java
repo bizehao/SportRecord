@@ -28,10 +28,6 @@ public class LoginActivity extends BaseActivity {
     }
 
     @Override
-    protected void inject() {
-    }
-
-    @Override
     protected void initView(Bundle savedInstanceState) {
         LoginFragment fragment = new LoginFragment();
         replaceFragment(fragment);

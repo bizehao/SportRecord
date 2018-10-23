@@ -3,6 +3,7 @@ package com.bzh.sportrecord.data.model;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 /**
  * @author 毕泽浩
@@ -12,7 +13,7 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class FriendsInfo {
     @PrimaryKey
-    private Long id; //id
+    @NonNull
     private String username; //用户名
     private String name; // 姓名
     private String headportrait; //头像
@@ -25,9 +26,8 @@ public class FriendsInfo {
     public FriendsInfo() {
     }
 
-    public FriendsInfo(Long id, String username, String name, String headportrait, String descript,
+    public FriendsInfo(String username, String name, String headportrait, String descript,
                        String address, String motto, String remarkname) {
-        this.id = id;
         this.username = username;
         this.name = name;
         this.headportrait = headportrait;
@@ -35,14 +35,6 @@ public class FriendsInfo {
         this.address = address;
         this.motto = motto;
         this.remarkname = remarkname;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getUsername() {

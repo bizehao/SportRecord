@@ -4,8 +4,11 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
+import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.data.model.MessageInfo;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
+
+import java.util.List;
 
 /**
  * @author 毕泽浩
@@ -14,12 +17,26 @@ import com.bzh.sportrecord.module.talk.WebSocketChatClient;
  */
 public class TalkViewModel extends ViewModel {
 
+    private MutableLiveData<List<MessageInfo>> messageInfos;
     private MutableLiveData<MessageInfo> messageInfoLiveData;
 
-    public MutableLiveData<MessageInfo> getMessageInfoLiveData() {
-        if(messageInfoLiveData == null){
+    public TalkViewModel() {
+        if (messageInfos == null) {
+            messageInfos = new MutableLiveData<>();
+            messageInfos.setValue(AppDatabase.getAppDatabase().messageInfoDao().findAllNoRead(false));
+        }
+        if (messageInfoLiveData == null) {
             messageInfoLiveData = new MutableLiveData<>();
         }
+    }
+
+    public LiveData<List<MessageInfo>> getMessageInfos() {
+
+        return messageInfos;
+    }
+
+    public LiveData<MessageInfo> getMessageInfoLiveData() {
+
         return messageInfoLiveData;
     }
 

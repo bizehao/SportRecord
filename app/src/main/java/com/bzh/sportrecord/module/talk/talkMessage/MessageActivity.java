@@ -1,5 +1,6 @@
 package com.bzh.sportrecord.module.talk.talkMessage;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,8 +20,10 @@ import com.bzh.chatkit.messages.MessageInput;
 import com.bzh.chatkit.messages.MessagesList;
 import com.bzh.chatkit.messages.MessagesListAdapter;
 import com.bzh.sportrecord.App;
+import com.bzh.sportrecord.MainAttrs;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.activity.BaseActivity;
+import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.data.model.MessageInfo;
 import com.bzh.sportrecord.model.Talk;
 import com.bzh.sportrecord.module.home.homePlan.TalkFragment;
@@ -37,6 +40,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import io.reactivex.Observable;
@@ -57,13 +62,20 @@ public class MessageActivity extends BaseActivity {
     @BindView(R.id.message_toolbar)
     Toolbar mToolbar;
 
+    @Inject
+    Gson gson;
+
+    @Inject
+    WebSocketChatClient webSocketChatClient;
+
+    @Inject
+    MainAttrs mainAttrs;
+
+    private MessageViewModel messageViewModel;
     protected ImageLoader imageLoader;
     protected MessagesListAdapter<Message> messagesAdapter;
     private int selectionCount;
     private Date lastLoadedDate;
-    private static Consumer<MessageInfo> talkConsumer; //观察者
-    private WebSocketChatClient webSocketChatClient; //websocket
-    private Gson gson = App.getGsonInstance(); //gson
     private Bitmap mBitmap; //对方的头像图片
     private User friend; //接受者(目前聊天的朋友)
     private User own; //发送者(当前用户)
@@ -71,11 +83,6 @@ public class MessageActivity extends BaseActivity {
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.activity_message;
-    }
-
-    @Override
-    protected void inject() {
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -91,6 +98,17 @@ public class MessageActivity extends BaseActivity {
         }
         friend = user;
         own = new User(App.getUsername(), App.getUsername(), App.getImg(), true);
+        messageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        messageViewModel.getMessages().observe(this, messageInfos -> {
+            if (messageInfos.size() > 0) {
+                for (MessageInfo messageInfo : messageInfos) {
+                    messageHandler(messageInfo);
+                }
+            }
+        });
+        messageViewModel.getNoReadMessages().observe(this, messageInfo -> {
+            messageHandler(messageInfo);
+        });
         imageLoader = new ImageLoader() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override //设置头像
@@ -109,41 +127,30 @@ public class MessageActivity extends BaseActivity {
             }
         };
         messagesAdapter = new MessagesListAdapter<>(App.getUsername(), imageLoader);//App.getUsername()
-        App app = (App)getApplication();
-        webSocketChatClient = app.getWebSocket();
+        App app = (App) getApplication();
         input.setInputListener(new MessageInput.InputListener() {//发送事件
             @SuppressWarnings("CheckResult")
             @Override
             public boolean onSubmit(CharSequence input) {
                 if (webSocketChatClient.isOpen()) {
-                    Observable.create(new ObservableOnSubscribe<MessageInfo>() { //添加会话
-                        @Override
-                        public void subscribe(ObservableEmitter<MessageInfo> emitter) throws Exception {
-                            String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                            Long talkID = UUID.randomUUID().getLeastSignificantBits();
-                            Date time = new Date(System.currentTimeMillis());
-                            Message message = new Message(id, own, input.toString(),time);
-                            messagesAdapter.addToStart(message, true);
-                            Talk talk = new Talk();
-                            talk.setCode("200");
-                            talk.setId(talkID);
-                            talk.setSender(own.getId());
-                            talk.setReceiver(friend.getId());
-                            talk.setMessage(input.toString());
-                            talk.setTime(time);
-                            String talkJson = gson.toJson(talk, Talk.class);
-                            webSocketChatClient.send(talkJson);
-                            //自己发送的消息存入数据库
-                            MessageInfo messageInfo = new MessageInfo();
-                            messageInfo.setId(talkID);
-                            messageInfo.setReceiver(talk.getReceiver());
-                            messageInfo.setSender(talk.getSender());
-                            messageInfo.setTime(talk.getTime());
-                            messageInfo.setMessage(talk.getMessage());
-                            messageInfo.setReadSign(true);
-                            emitter.onNext(messageInfo);
-                        }
-                    }).subscribe(TalkFragment.getLastMsgObserver());
+                    String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
+                    Long talkID = UUID.randomUUID().getLeastSignificantBits();
+                    Date time = new Date(System.currentTimeMillis());
+                    Message message = new Message(id, own, input.toString(), time);
+                    messagesAdapter.addToStart(message, true);
+                    Talk talk = new Talk();
+                    talk.setCode("200");
+                    talk.setId(talkID);
+                    talk.setSender(own.getId());
+                    talk.setReceiver(friend.getId());
+                    talk.setMessage(input.toString());
+                    talk.setTime(time);
+                    String talkJson = gson.toJson(talk, Talk.class);
+                    webSocketChatClient.send(talkJson);
+                    //自己发送的消息存入数据库
+                    MessageInfo messageInfo = new MessageInfo(talk, true);
+                    AppDatabase.getAppDatabase().messageInfoDao().insert(messageInfo);
+                    mainAttrs.setOwnSendMsg(messageInfo);
                 }
                 return true;
             }
@@ -164,7 +171,9 @@ public class MessageActivity extends BaseActivity {
             }
         });
         messagesList.setAdapter(messagesAdapter);
-        initUnreadMsg();//初始化未读的消息
+        webSocketChatClient.setMessagehandler(talk -> {
+            messageViewModel.setNoReadMessages(new MessageInfo(talk, false));
+        });
     }
 
     public static void open(Context context, User user) {
@@ -177,7 +186,7 @@ public class MessageActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                //finish();
                 break;
         }
         return true;
@@ -200,83 +209,43 @@ public class MessageActivity extends BaseActivity {
         }, 1000);
     }
 
-    //初始化的信息
-    @SuppressWarnings("CheckResult")
-    public void initUnreadMsg() {
-        System.out.println("初始化消息");
-        Observable.create(new ObservableOnSubscribe<ArrayList<Message>>() {
-            @Override
-            public void subscribe(ObservableEmitter<ArrayList<Message>> emitter) throws Exception {
-                List<MessageInfo> messageInfos = new ArrayList<>();
-                ArrayList<Message> messageArrays = new ArrayList<>();
-                messageInfos.addAll(null);
-                messageInfos.addAll(null);
-                Collections.sort(messageInfos, new Comparator<MessageInfo>() {
-                    @Override
-                    public int compare(MessageInfo o1, MessageInfo o2) {
-                        return o1.getTime().compareTo(o2.getTime());
-                    }
-                });
-                if (messageInfos.size() > 0) {
-                    for (int i = 0; i < messageInfos.size(); i++) {
-                        MessageInfo messageInfo = messageInfos.get(i);
-                        String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                        Message message;
-                        if(messageInfo.getSender().equals(friend.getId())){
-                            message = new Message(id, friend, messageInfo.getMessage(),messageInfo.getTime());
-                        }else {
-                            message = new Message(id, own, messageInfo.getMessage(),messageInfo.getTime());
-                        }
-                        messageArrays.add(message);
-                    }
-                }
-                emitter.onNext(messageArrays);
-            }
-        }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ArrayList<Message>>() {
-                    @Override
-                    public void accept(ArrayList<Message> messages) throws Exception {
-                        messagesAdapter.addToEnd(messages, true);
-                    }
-                });
-    }
-
-    //初始化接收消息的观察者
-    public void initTalkConsumer() {
-        talkConsumer = new Consumer<MessageInfo>() {
-            @Override
-            public void accept(MessageInfo messageInfo) throws Exception {
-                if (messageInfo.getSender().equals(friend.getId())) {
-                    Message message = new Message(messageInfo.getId().toString(), friend, messageInfo.getMessage());
-                    messagesAdapter.addToStart(message, true);
-                    //更改读取状态
-                    messageInfo.setReadSign(true);
-                }
-            }
-        };
-    }
-
-    //获取订阅者
-    public static Consumer<MessageInfo> getObserver() {
-        return talkConsumer;
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        initTalkConsumer();//初始化观察信息的观察者
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        talkConsumer = null;
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        App.setFriend(null);
     }
+
+    @SuppressWarnings("CheckResult")
+    public void messageHandler(MessageInfo messageInfo) {
+        Observable.create((ObservableOnSubscribe<Message>) emitter -> {
+            Message message;
+            if (App.getFriend() != null && messageInfo.getSender().equals(friend.getId())) {
+                mainAttrs.setClearZeroName(friend.getId());
+                if (!messageInfo.isReadSign()) {
+                    messageInfo.setReadSign(true); //更改读取状态
+                    AppDatabase.getAppDatabase().messageInfoDao().update(messageInfo);
+                }
+                message = new Message(messageInfo.getId().toString(), friend, messageInfo.getMessage(), messageInfo.getTime());
+            } else {
+                message = new Message(messageInfo.getId().toString(), own, messageInfo.getMessage(), messageInfo.getTime());
+            }
+            emitter.onNext(message);
+        }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(message -> {
+                    messagesAdapter.addToStart(message, true);
+                });
+    }
+
 }

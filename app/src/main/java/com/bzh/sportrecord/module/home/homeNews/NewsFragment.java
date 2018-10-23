@@ -9,6 +9,8 @@ import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.fragment.BaseFragment;
 import com.bzh.sportrecord.module.home.HomeViewModel;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 
 public class NewsFragment extends BaseFragment {
@@ -17,6 +19,10 @@ public class NewsFragment extends BaseFragment {
     private HomeViewModel mHomeViewModel;
     @BindView(R.id.fragmentTwo)
     TextView mMapView;
+
+    @Inject
+    public NewsFragment() {
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,10 +41,6 @@ public class NewsFragment extends BaseFragment {
     @Override
     protected void initView(Bundle savedInstanceState) {
 
-    }
-
-    @Override
-    protected void inject() {
     }
 
 }

@@ -1,7 +1,6 @@
 package com.bzh.sportrecord.module.home;
 
 import android.Manifest;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -37,14 +35,14 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.BuildConfig;
+import com.bzh.sportrecord.MainAttrs;
 import com.bzh.sportrecord.R;
-import com.bzh.sportrecord.api.DataManager;
+import com.bzh.sportrecord.api.RetrofitHelper;
 import com.bzh.sportrecord.base.activity.BaseActivity;
 import com.bzh.sportrecord.module.home.homeNews.NewsFragment;
 import com.bzh.sportrecord.module.home.homePlan.TalkFragment;
@@ -54,12 +52,9 @@ import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
 import com.bzh.sportrecord.utils.AppManager;
 import com.bzh.sportrecord.utils.CommonUtil;
 import com.bzh.sportrecord.utils.FileUtil;
-
 import java.io.File;
 import java.util.Objects;
-
 import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -99,6 +94,16 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
 
     @Inject
     HomeContract.Presenter mPresenter;
+    @Inject
+    SportFragment sportFragment;
+    @Inject
+    NewsFragment newsFragment;
+    @Inject
+    TalkFragment talkFragment;
+    @Inject
+    MainAttrs mainAttrs;
+    @Inject
+    RetrofitHelper retrofitHelper;
 
     private Fragment[] fragments = new Fragment[3];
     private int[] colors = new int[3];
@@ -112,11 +117,6 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
     protected void beforeInit() {
         super.beforeInit();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN); //固定页面压制 bug:底部状态栏跟随键盘
-    }
-
-    @Override
-    protected void inject() {
-        activityComponent.inject(this);
     }
 
     @Override
@@ -140,9 +140,9 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         mDrawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
-        fragments[0] = new SportFragment();
-        fragments[1] = new NewsFragment();
-        fragments[2] = new TalkFragment();
+        fragments[0] = sportFragment;
+        fragments[1] = newsFragment;
+        fragments[2] = talkFragment;
         colors[0] = R.color.blue;
         colors[1] = R.color.red;
         colors[2] = R.color.colorAccent;
@@ -155,6 +155,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                 Intent instant;
                 switch (menuItem.getItemId()) {
                     case R.id.nav_login: //登录
+                        System.out.println("测试");
                         LoginActivity.open(HomeActivity.this);
                         break;
                     case R.id.nav_loginout: //注销
@@ -221,7 +222,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                     mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
                         @Override
                         public void onClick(View v) {
-                            if(App.getMainAttrs().getLoginSign().getValue()){
+                            if(mainAttrs.getLoginSign().getValue()){
                                 FriendsActivity.open(HomeActivity.this);
                             }else {
                                 showToast("请您先登录");
@@ -264,8 +265,8 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
             public void onTabReselected(int position) {
             }
         });
-        Intent intent = getIntent();
-        App.getMainAttrs().getLoginSign().observe(this, aBoolean -> {
+
+        mainAttrs.getLoginSign().observe(this, aBoolean -> {
             if(aBoolean != null && aBoolean){
                 successSetting();
             }else {
@@ -280,14 +281,22 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         context.startActivity(intent);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPresenter.takeView(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.dropView();
     }
 
     @Override // menu
@@ -497,14 +506,13 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
 
                     if (type == 1) {
                         //上传图片
-                        DataManager dataManager = DataManager.getInstance();
                         File file = new File(cropImagePath);
                         // 创建 RequestBody，用于封装构建RequestBody
                         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
                         // MultipartBody.Part  和后端约定好Key，这里的partName是用image
                         MultipartBody.Part body = MultipartBody.Part.createFormData("headPortrait", file.getName(), requestFile);
                         RequestBody username = RequestBody.create(MediaType.parse("text/x-markdown"), App.getUsername());
-                        dataManager.successHandler(dataManager.uploadPng(username, body), new DataManager.callBack() {
+                        retrofitHelper.successHandler(retrofitHelper.getServer().uploadPng(username, body), new RetrofitHelper.callBack() {
                             @Override
                             public <T> void run(T t) {
                                 mCircleImageView.setImageBitmap(bitMap);
@@ -540,8 +548,4 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         AppManager.getAppManager().AppExit(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }

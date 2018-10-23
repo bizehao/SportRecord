@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -67,13 +68,13 @@ public class AddFriendsRecycleViewAdapter extends RecyclerView.Adapter<AddFriend
         ApiUserInfos.DataBean friend = friends.get(i);
         if (friend.isExit()) {
             System.out.println("进行判断");
-            viewHolder.friendAdd.setText("已添加");
-            viewHolder.friendAdd.setBackgroundColor(ContextCompat.getColor(context, R.color.gray));
-            viewHolder.friendAdd.setEnabled(false);
+            viewHolder.friendAdd.setBackground(ContextCompat.getDrawable(context,R.drawable.round_yellow));
+            viewHolder.friendAdd.setImageResource(R.mipmap.truepng);
+            viewHolder.friendAdd.setScaleType(ImageView.ScaleType.CENTER);
         } else {
-            viewHolder.friendAdd.setText("添加");
-            viewHolder.friendAdd.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
-            viewHolder.friendAdd.setEnabled(true);
+            viewHolder.friendAdd.setBackground(ContextCompat.getDrawable(context,R.drawable.round_blue));
+            viewHolder.friendAdd.setImageResource(R.mipmap.add);
+            viewHolder.friendAdd.setScaleType(ImageView.ScaleType.CENTER);
             if (listener != null) {
                 viewHolder.friendAdd.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -110,13 +111,14 @@ public class AddFriendsRecycleViewAdapter extends RecyclerView.Adapter<AddFriend
 
         private CircleImageView imageView; //头像
         private TextView name; //用户name
-        private AppCompatButton friendAdd; //添加按钮
+        private ImageButton friendAdd; //添加按钮
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.addfriends_icon);
             name = itemView.findViewById(R.id.addfriends_name);
             friendAdd = itemView.findViewById(R.id.addfriends_button);
+            friendAdd.setEnabled(true);
         }
     }
 

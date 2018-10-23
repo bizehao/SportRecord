@@ -1,5 +1,7 @@
 package com.bzh.sportrecord.model;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 /**
@@ -7,7 +9,7 @@ import java.io.Serializable;
  * @Description: 朋友 pojo
  * @time 2018/9/30 10:49
  */
-public class Friend implements Serializable{
+public class Friend implements Serializable, Comparable<Friend>{
 
     private String name;
     private String remarks; //备注
@@ -55,5 +57,19 @@ public class Friend implements Serializable{
 
     public void setPinyin(String pinyin) {
         this.pinyin = pinyin;
+    }
+
+    @Override
+    public String toString() {
+        return "Friend{" +
+                "name='" + name + '\'' +
+                ", remarks='" + remarks + '\'' +
+                ", pinyin='" + pinyin + '\'' +
+                '}';
+    }
+
+    @Override
+    public int compareTo(@NonNull Friend o) {
+        return pinyin.compareTo(o.pinyin);
     }
 }

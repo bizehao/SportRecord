@@ -1,34 +1,27 @@
 package com.bzh.sportrecord.module.login.loginInRegister;
 
-import android.content.Context;
-
-import com.bzh.sportrecord.api.DataManager;
+import com.bzh.sportrecord.api.RetrofitHelper;
 import com.bzh.sportrecord.model.ApiRegister;
-import com.bzh.sportrecord.model.ApiUserInfo;
-import com.bzh.sportrecord.module.login.loginInLogin.LoginContract;
-
 import java.util.Map;
-
+import javax.inject.Inject;
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 
 public class RegisterPresenter implements RegisterContract.Presenter {
 
-    private Context mContext;
-
     private RegisterContract.View mView;
 
-    public RegisterPresenter(Context context, RegisterContract.View view) {
-        this.mContext = context;
-        this.mView = view;
+    @Inject
+    RetrofitHelper retrofitHelper;
+
+    @Inject
+    public RegisterPresenter() {
     }
 
     @Override
     public void register() {
         Map<String, String>  map = mView.getAllUserInfo();
-        DataManager dataManager = DataManager.getInstance();
-        Observable<ApiRegister> observable = dataManager.register(map);
-        dataManager.successHandler(observable, new DataManager.callBack() {
+        Observable<ApiRegister> observable = retrofitHelper.getServer().register(map);
+        retrofitHelper.successHandler(observable, new RetrofitHelper.callBack() {
             @Override
             public <T> void run(T t) {
                 ApiRegister apiRegister = (ApiRegister) t;
@@ -41,5 +34,15 @@ public class RegisterPresenter implements RegisterContract.Presenter {
                 }
             }
         });
+    }
+
+    @Override
+    public void takeView(RegisterContract.View view) {
+        mView = view;
+    }
+
+    @Override
+    public void dropView() {
+        mView = null;
     }
 }

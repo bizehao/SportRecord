@@ -42,15 +42,11 @@ public class LoginFragment extends BaseFragment implements LoginContract.View {
     AppCompatButton loginBut;
 
     @Inject
-    LoginContract.Presenter mLoginPresenter;
+    LoginContract.Presenter mPresenter;
 
     @Override
     protected int getContentViewLayoutID() {
         return R.layout.fragment_login;
-    }
-
-    protected void inject(){
-        fragmentComponent.inject(this);
     }
 
     @Override
@@ -69,7 +65,7 @@ public class LoginFragment extends BaseFragment implements LoginContract.View {
 
     @OnClick(R.id.login_but) //点击登录
     public void setmLoginButClick(View view){
-        mLoginPresenter.login();
+        mPresenter.login();
     }
 
     @Override
@@ -80,6 +76,18 @@ public class LoginFragment extends BaseFragment implements LoginContract.View {
     @Override
     public String getPassword() {
         return passwordText.getText().toString();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPresenter.takeView(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.dropView();
     }
 
 }

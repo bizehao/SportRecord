@@ -1,36 +1,25 @@
 package com.bzh.sportrecord.base.activity;
 
-import android.arch.lifecycle.DefaultLifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
-
 import com.bzh.sofialibrary.Sofia;
-import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.view.BaseView;
-import com.bzh.sportrecord.di.component.ActivityComponent;
-import com.bzh.sportrecord.di.component.DaggerActivityComponent;
-import com.bzh.sportrecord.di.module.ActivityModule;
 import com.bzh.sportrecord.utils.AppManager;
-
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import dagger.android.DaggerDialogFragment;
+import dagger.android.support.DaggerAppCompatActivity;
 
 /**
  * 基础 activity
  *
  */
-public abstract class BaseActivity extends AppCompatActivity implements BaseView {
-
-    protected ActivityComponent activityComponent;
+public abstract class BaseActivity extends DaggerAppCompatActivity implements BaseView {
 
     protected Unbinder unBinder;
-
     /**
      * 获取布局ID
      *
@@ -40,7 +29,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        //AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         beforeInit(); //初始化之前
         if (getContentViewLayoutID() != 0) {
@@ -56,11 +44,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
         unBinder = ButterKnife.bind(this); //设置 ButterKnife
-        activityComponent = DaggerActivityComponent.builder()
-                .appComponent(App.appComponent)
-                .activityModule(new ActivityModule(this,this))
-                .build();
-        inject();
     }
 
     @Override
@@ -73,16 +56,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     }
 
     /**
-     * 注入组件
-     */
-    protected abstract void inject();
-
-    /**
      * 界面初始化前期准备
      */
-    protected void beforeInit() { }
-
-    ;
+    protected void beforeInit() { };
 
     /**
      * 初始化布局以及View控件

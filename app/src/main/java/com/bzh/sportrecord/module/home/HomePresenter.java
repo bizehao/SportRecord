@@ -1,50 +1,54 @@
 package com.bzh.sportrecord.module.home;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
-import android.os.Handler;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 
-import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.App;
-import com.bzh.sportrecord.api.DataManager;
+import com.bzh.sportrecord.MainAttrs;
+import com.bzh.sportrecord.api.RetrofitHelper;
+import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.data.model.FriendsInfo;
 import com.bzh.sportrecord.model.ApiCommon;
 import com.bzh.sportrecord.model.ApiFriends;
 import com.bzh.sportrecord.model.ApiUserInfo;
 import com.bzh.sportrecord.module.login.LoginActivity;
-import com.bzh.sportrecord.utils.AppManager;
+import com.bzh.sportrecord.module.talk.WebSocketChatClient;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 
 public class HomePresenter implements HomeContract.Presenter {
 
     private static final String TAG = "HomePresenter";
 
-    private Context mContext;
-
     private HomeContract.View mView;
 
-    public HomePresenter(Context context, HomeContract.View view) {
-        this.mContext = context;
-        this.mView = view;
+    @Inject
+    RetrofitHelper retrofitHelper;
+
+    @Inject
+    MainAttrs mainAttrs;
+
+    @Inject
+    WebSocketChatClient webSocketChatClient;
+
+    @Inject
+    public HomePresenter() {
     }
 
     @Override
     public void loadData(String username) {
-        DataManager dataManager = DataManager.getInstance();
-        Observable<ApiUserInfo> observable = dataManager.getUserInfo(username);
-        dataManager.successHandler(observable, new DataManager.callBack() { //获取该用户的个人信息
+        Observable<ApiUserInfo> observable = retrofitHelper.getServer().getUserInfo(username);
+        retrofitHelper.successHandler(observable, new RetrofitHelper.callBack() { //获取该用户的个人信息
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public <T> void run(T t) {
@@ -57,12 +61,11 @@ public class HomePresenter implements HomeContract.Presenter {
                 mView.setHeadPortrait(bitMap);
                 mView.setHeadName(apiUserInfo.getData().getName());
                 mView.setHeadMotto(apiUserInfo.getData().getMotto());
-                App app = (App) mContext.getApplicationContext();
-                app.connectWS(); //连接 webSocket;
+                webSocketChatClient.connect(); //连接 webSocket;
             }
         });
-        Observable<ApiFriends> friends = dataManager.getFriends(username);
-        dataManager.successHandler(friends, new DataManager.callBack() { //缓存该用户的好友信息
+        Observable<ApiFriends> friends = retrofitHelper.getServer().getFriends(username);
+        retrofitHelper.successHandler(friends, new RetrofitHelper.callBack() { //缓存该用户的好友信息
             @Override
             public <T> void run(T t) {
                 new Thread(new Runnable() {
@@ -71,10 +74,9 @@ public class HomePresenter implements HomeContract.Presenter {
                         ApiFriends apiUserInfo = (ApiFriends) t;
                         //daoSession.getMessageInfoDao().deleteAll();
                         List<ApiFriends.DataBean> list = apiUserInfo.getData();
-                        FriendsInfo info;
+                        List<FriendsInfo> infos = new ArrayList<>();
                         for (ApiFriends.DataBean item : list) {
-                            info = new FriendsInfo();
-                            info.setId(null);
+                            FriendsInfo info = new FriendsInfo();
                             info.setUsername(item.getUsername());
                             info.setName(item.getName());
                             info.setAddress(item.getAddress());
@@ -82,7 +84,9 @@ public class HomePresenter implements HomeContract.Presenter {
                             info.setHeadportrait(item.getHeadportrait());
                             info.setMotto(item.getMotto());
                             info.setRemarkname(item.getRemarkName());
+                            infos.add(info);
                         }
+                        AppDatabase.getAppDatabase().friendsInfoDao().insert(infos);
                     }
                 }).start();
             }
@@ -91,20 +95,27 @@ public class HomePresenter implements HomeContract.Presenter {
 
     @Override
     public void loginOut(String username) {
-        DataManager dataManager = DataManager.getInstance();
-        dataManager.successHandler(dataManager.loginOut(username), new DataManager.callBack() {
+        retrofitHelper.successHandler(retrofitHelper.getServer().loginOut(username), new RetrofitHelper.callBack() {
             @Override
             public <T> void run(T t) {
                 ApiCommon apiCommon = (ApiCommon) t;
-                if((boolean)apiCommon.getData()){
+                if ((boolean) apiCommon.getData()) {
                     mView.failSettring();
-                    App.setLoginSign(false);
-                    App app = (App) mContext.getApplicationContext();
-                    app.getWebSocket().close();
-                    App.getMainAttrs().setLoginSign(false);
-                    LoginActivity.open(mContext);
+                    mainAttrs.setLoginSign(false);
+                    webSocketChatClient.close();
+                    LoginActivity.open((Context) mView);
                 }
             }
         });
+    }
+
+    @Override
+    public void takeView(HomeContract.View view) {
+        mView = view;
+    }
+
+    @Override
+    public void dropView() {
+        mView = null;
     }
 }

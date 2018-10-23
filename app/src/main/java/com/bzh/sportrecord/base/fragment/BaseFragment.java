@@ -2,31 +2,20 @@ package com.bzh.sportrecord.base.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.bzh.sportrecord.App;
-import com.bzh.sportrecord.base.presenter.BasePresenter;
 import com.bzh.sportrecord.base.view.BaseView;
-import com.bzh.sportrecord.di.component.DaggerActivityComponent;
-import com.bzh.sportrecord.di.component.DaggerFragmentComponent;
-import com.bzh.sportrecord.di.component.FragmentComponent;
-import com.bzh.sportrecord.di.module.FragmentModule;
-
-import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import dagger.android.support.DaggerFragment;
 
-public abstract class BaseFragment extends Fragment implements BaseView {
+public abstract class BaseFragment extends DaggerFragment implements BaseView {
 
     private Unbinder unbinder;
 
     private Toast mToast;
-
-    protected FragmentComponent fragmentComponent;
 
     /**
      * 获取布局ID
@@ -52,17 +41,8 @@ public abstract class BaseFragment extends Fragment implements BaseView {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         unbinder = ButterKnife.bind(this, view);
-        fragmentComponent = DaggerFragmentComponent.builder()
-                .fragmentModule(new FragmentModule(getActivity(),this))
-                .build();
-        inject();
         initView(savedInstanceState);
     }
-
-    /**
-     * 注入组件
-     */
-    protected abstract void inject();
 
     @Override
     public void onDestroyView() {
