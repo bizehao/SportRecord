@@ -1,6 +1,7 @@
 package com.bzh.sportrecord.module.home;
 
 import android.Manifest;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -35,8 +37,11 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+import com.ashokvarma.bottomnavigation.ShapeBadgeItem;
+import com.ashokvarma.bottomnavigation.TextBadgeItem;
 import com.bumptech.glide.Glide;
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.BuildConfig;
@@ -48,13 +53,18 @@ import com.bzh.sportrecord.module.home.homeNews.NewsFragment;
 import com.bzh.sportrecord.module.home.homePlan.TalkFragment;
 import com.bzh.sportrecord.module.home.homeSport.SportFragment;
 import com.bzh.sportrecord.module.login.LoginActivity;
+import com.bzh.sportrecord.module.setting.SettingActivity;
 import com.bzh.sportrecord.module.talk.talkFriends.FriendsActivity;
+import com.bzh.sportrecord.ui.widget.MyOneLineView;
 import com.bzh.sportrecord.utils.AppManager;
 import com.bzh.sportrecord.utils.CommonUtil;
 import com.bzh.sportrecord.utils.FileUtil;
+
 import java.io.File;
 import java.util.Objects;
+
 import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -172,6 +182,7 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                         break;
                     case R.id.nav_setup:
                         showToast("设置");
+                        SettingActivity.open(HomeActivity.this);
                         break;
                     case R.id.nav_sign_out:
                         showToast("退出");
@@ -182,11 +193,34 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
             }
         });
         //底部菜单
+        TextBadgeItem numberBadgeItem = new TextBadgeItem();
+        numberBadgeItem.setBorderWidth(3)
+                .setBackgroundColorResource(R.color.red)
+                .setHideOnSelect(false);
         mBottomNavigationBar.setMode(BottomNavigationBar.MODE_SHIFTING).setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_RIPPLE)
                 .addItem(new BottomNavigationItem(R.mipmap.home_sport, "运动").setActiveColorResource(colors[0]))
                 .addItem(new BottomNavigationItem(R.mipmap.home_news, "资讯").setActiveColorResource(colors[1]))
-                .addItem(new BottomNavigationItem(R.mipmap.home_plan, "个人计划").setActiveColorResource(colors[2]))
+                .addItem(new BottomNavigationItem(R.mipmap.home_plan, "个人计划").setActiveColorResource(colors[2])
+                        .setBadgeItem(numberBadgeItem))
                 .setFirstSelectedPosition(0).initialise();
+
+        mainAttrs.getLoginSign().observe(this, aBoolean -> {
+            if(aBoolean){
+                numberBadgeItem.show();
+            }else {
+                numberBadgeItem.hide();
+            }
+        });
+
+        mainAttrs.getNoReadCount().observe(this, integer -> {
+            if ((mainAttrs.getLoginSign().getValue() != null && !mainAttrs.getLoginSign().getValue()) || (integer != null && integer == 0)) {
+                numberBadgeItem.hide();
+            } else {
+                numberBadgeItem.show();
+                numberBadgeItem.setText(String.valueOf(integer));
+            }
+        });
+
         getSupportFragmentManager().beginTransaction().replace(R.id.ttest, fragments[0]).commit();//设置默认的fragment
         mFloatingActionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, colors[0])));//设置默认颜色
         Glide.with(HomeActivity.this).load(ContextCompat.getDrawable(HomeActivity.this, R.mipmap.button_sport)).into(mFloatingActionButton);
@@ -222,9 +256,9 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
                     mFloatingActionButton.setOnClickListener(new View.OnClickListener() { //悬浮按钮点击跳转到好友列表
                         @Override
                         public void onClick(View v) {
-                            if(mainAttrs.getLoginSign().getValue()){
+                            if (mainAttrs.getLoginSign().getValue()) {
                                 FriendsActivity.open(HomeActivity.this);
-                            }else {
+                            } else {
                                 showToast("请您先登录");
                             }
 
@@ -267,16 +301,16 @@ public class HomeActivity extends BaseActivity implements HomeContract.View {
         });
 
         mainAttrs.getLoginSign().observe(this, aBoolean -> {
-            if(aBoolean != null && aBoolean){
+            if (aBoolean != null && aBoolean) {
                 successSetting();
-            }else {
+            } else {
                 failSettring();
             }
         });
     }
 
     //跳转到这儿
-    public static void open(Context context){
+    public static void open(Context context) {
         Intent intent = new Intent(context, HomeActivity.class);
         context.startActivity(intent);
     }

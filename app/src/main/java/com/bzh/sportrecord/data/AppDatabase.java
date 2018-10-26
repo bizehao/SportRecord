@@ -61,4 +61,5 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract MessageInfoDao messageInfoDao();
 
     public abstract FriendsInfoDao friendsInfoDao();
+
 }

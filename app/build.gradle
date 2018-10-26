@@ -31,60 +31,93 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':sofialibrary')
     implementation project(':chatkit')
-    implementation project(':dialoglibrary')
+
+    //气泡
+    implementation project(':apilibrary')
+    annotationProcessor project(':compilerLib')
+    implementation project(':annotationLib')
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibVersion"
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
     // RxJava2.X.Y 导入的包
     implementation 'io.reactivex.rxjava2:rxjava:2.2.1'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+
     //图片加载
     implementation 'com.github.bumptech.glide:glide:4.7.1'
+
     // view 注入框架
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
     //Design Supper库
     implementation "com.android.support:design:$rootProject.supportLibVersion"
+
     //gson
     implementation 'com.google.code.gson:gson:2.8.5'
+
     //网络请求库
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+
     //卡片
     implementation "com.android.support:cardview-v7:$rootProject.supportLibVersion"
+
     //dagger2
     implementation 'com.google.dagger:dagger-android:2.17'
-    implementation 'com.google.dagger:dagger-android-support:2.17' // if you use the support libraries
+    implementation 'com.google.dagger:dagger-android-support:2.17'
+
+    // if you use the support libraries
     implementation 'com.google.dagger:dagger:2.17'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.17'
     annotationProcessor 'com.google.dagger:dagger-android-processor:2.17'
+
     //图片圆形化
     implementation 'de.hdodenhof:circleimageview:2.2.0'
+
     //底部状态栏
     implementation 'com.ashokvarma.android:bottom-navigation-bar:2.0.5'
+
     //webSocket
     implementation 'org.java-websocket:Java-WebSocket:1.3.9'
+
     //拼音
     implementation 'com.belerweb:pinyin4j:2.5.0'
+
     //Timber
     implementation 'com.jakewharton.timber:timber:4.6.0'
+
     //jetpack
+
     // LiveData + ViewModel
     implementation 'android.arch.lifecycle:extensions:1.1.1'
-    implementation "android.arch.lifecycle:common-java8:1.1.1"
+    implementation 'android.arch.lifecycle:common-java8:1.1.1'
+
     //room
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
     implementation 'android.arch.persistence.room:rxjava2:1.0.0'
+
     //paging
     implementation 'android.arch.paging:runtime:1.0.1'
     implementation 'android.arch.paging:rxjava2:1.0.1'
 
+    //数据库调试
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.0'
 
+    //按钮
+    implementation 'com.github.medyo:fancybuttons:1.9.0'
 
+    //弹出菜单
+    implementation 'com.nightonke:boommenu:2.1.1'
 
+    //弹框
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
+
+    implementation 'com.android.support:support-annotations:28.0.0'
 }

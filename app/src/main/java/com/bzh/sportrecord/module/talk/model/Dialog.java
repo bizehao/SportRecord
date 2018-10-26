@@ -1,5 +1,7 @@
 package com.bzh.sportrecord.module.talk.model;
 
+import android.arch.persistence.room.Embedded;
+
 import com.bzh.chatkit.commons.models.IDialog;
 
 import java.io.Serializable;

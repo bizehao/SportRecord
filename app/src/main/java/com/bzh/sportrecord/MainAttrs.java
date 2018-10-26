@@ -3,7 +3,10 @@ package com.bzh.sportrecord;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 
+import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.data.model.MessageInfo;
+
+import javax.inject.Inject;
 
 /**
  * @author 毕泽浩
@@ -20,7 +23,10 @@ public class MainAttrs {
 
     private MutableLiveData<MessageInfo> ownSendMsg; //自己发送的消息
 
+    private LiveData<Integer> noReadCount; //未读信息条数
+
     public MainAttrs() {
+        noReadCount = AppDatabase.getAppDatabase().messageInfoDao().getNoReadCount(false);
         if (loginSign == null) {
             loginSign = new MutableLiveData<>();
             loginSign.setValue(false);
@@ -28,10 +34,10 @@ public class MainAttrs {
         if (networkSign == null) {
             networkSign = new MutableLiveData<>();
         }
-        if(clearZeroName == null){
+        if (clearZeroName == null) {
             clearZeroName = new MutableLiveData<>();
         }
-        if(ownSendMsg == null){
+        if (ownSendMsg == null) {
             ownSendMsg = new MutableLiveData<>();
         }
     }
@@ -68,5 +74,9 @@ public class MainAttrs {
 
     public void setNetworkSign(boolean networkSign) {
         this.networkSign.postValue(networkSign);
+    }
+
+    public LiveData<Integer> getNoReadCount() {
+        return noReadCount;
     }
 }

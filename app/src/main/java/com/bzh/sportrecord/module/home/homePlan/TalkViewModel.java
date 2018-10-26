@@ -3,10 +3,8 @@ package com.bzh.sportrecord.module.home.homePlan;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
-
 import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.data.model.MessageInfo;
-import com.bzh.sportrecord.module.talk.WebSocketChatClient;
 
 import java.util.List;
 
@@ -17,8 +15,8 @@ import java.util.List;
  */
 public class TalkViewModel extends ViewModel {
 
-    private MutableLiveData<List<MessageInfo>> messageInfos;
-    private MutableLiveData<MessageInfo> messageInfoLiveData;
+    private MutableLiveData<List<MessageInfo>> messageInfos; //首次进入加载的会话
+    private MutableLiveData<MessageInfo> messageInfoLiveData; //运行中聊天的会话
 
     public TalkViewModel() {
         if (messageInfos == null) {
@@ -29,6 +27,7 @@ public class TalkViewModel extends ViewModel {
             messageInfoLiveData = new MutableLiveData<>();
         }
     }
+
 
     public LiveData<List<MessageInfo>> getMessageInfos() {
 

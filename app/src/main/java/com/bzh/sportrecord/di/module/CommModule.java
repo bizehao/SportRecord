@@ -1,6 +1,8 @@
 package com.bzh.sportrecord.di.module;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.MainAttrs;
@@ -46,7 +48,7 @@ public abstract class CommModule {
     @Provides
     public static WebSocketChatClient providerWebSocketChatClient(Gson gson, MainAttrs mainAttrs) {
         try {
-            return new WebSocketChatClient(new URI("ws://192.168.1.196:8080"), gson, mainAttrs);
+            return new WebSocketChatClient(new URI("ws://"+App.ip+":8080"), gson, mainAttrs);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -57,5 +59,11 @@ public abstract class CommModule {
     @Provides
     public static RetrofitHelper providerRetrofitHelper(MainAttrs mainAttrs) {
         return new RetrofitHelper(mainAttrs);
+    }
+
+    @Singleton
+    @Provides
+    public static SharedPreferences providerSharedPreferences(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context);
     }
 }

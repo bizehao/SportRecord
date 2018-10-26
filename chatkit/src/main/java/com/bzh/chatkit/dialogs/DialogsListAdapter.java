@@ -62,8 +62,10 @@ public class DialogsListAdapter<DIALOG extends IDialog>
     private OnDialogViewClickListener<DIALOG> onDialogViewClickListener;
     private OnDialogLongClickListener<DIALOG> onLongItemClickListener;
     private OnDialogViewLongClickListener<DIALOG> onDialogViewLongClickListener;
+    private OnDragDismissDelegate<DIALOG> onDragDismissDelegate;//拖动事件
     private DialogListStyle dialogStyle;
     private DateFormatter.Formatter datesFormatter;
+
 
     //新增
     private OnSlidingMenuClickListener<DIALOG> onSlidingMenuClickListener;
@@ -112,6 +114,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
         holder.setDatesFormatter(datesFormatter);
         holder.onBind(items.get(position));
         holder.setOnSlidingMenuClickListener(onSlidingMenuClickListener);
+        holder.setDragDismissDelegate(onDragDismissDelegate);
     }
 
     @Override
@@ -150,7 +153,6 @@ public class DialogsListAdapter<DIALOG extends IDialog>
             if (items.get(i).getId().equals(id)) {
                 items.remove(i);
                 notifyItemRemoved(i);
-
             }
         }
     }
@@ -232,7 +234,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
 
     /**
      * Move an item
-     *
+     * 更改了 增添了监听
      * @param fromPosition the actual position of the item
      * @param toPosition   the new position of the item
      */
@@ -454,8 +456,14 @@ public class DialogsListAdapter<DIALOG extends IDialog>
         this.datesFormatter = datesFormatter;
     }
 
+    //滑动菜单
     public void setOnSlidingMenuClickListener(OnSlidingMenuClickListener<DIALOG> clickListener) {
         this.onSlidingMenuClickListener = clickListener;
+    }
+
+    //徽章拖动事件
+    public void setDragDismissDelegate(OnDragDismissDelegate<DIALOG> clickListener) {
+        this.onDragDismissDelegate = clickListener;
     }
 
     //TODO ability to set style programmatically
@@ -496,6 +504,11 @@ public class DialogsListAdapter<DIALOG extends IDialog>
         void onDeleteClick(DIALOG dialog);
     }
 
+    //移除气泡徽章的监听
+    public interface OnDragDismissDelegate<DIALOG extends IDialog>{
+        void onDragClick(DIALOG dialog);
+    }
+
     /*
      * HOLDERS
      * */
@@ -509,6 +522,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
         protected DateFormatter.Formatter datesFormatter;
 
         protected OnSlidingMenuClickListener<DIALOG> onSlidingMenuClickListener;
+        protected OnDragDismissDelegate<DIALOG> onDragDismissDelegate;//拖动事件
 
         public BaseDialogViewHolder(View itemView) {
             super(itemView);
@@ -540,6 +554,11 @@ public class DialogsListAdapter<DIALOG extends IDialog>
 
         public void setOnSlidingMenuClickListener(OnSlidingMenuClickListener<DIALOG> onSlidingMenuClickListener) {
             this.onSlidingMenuClickListener = onSlidingMenuClickListener;
+        }
+
+        //徽章拖动事件
+        public void setDragDismissDelegate(OnDragDismissDelegate onDragDismissDelegate) {
+            this.onDragDismissDelegate = onDragDismissDelegate;
         }
     }
 
@@ -574,10 +593,11 @@ public class DialogsListAdapter<DIALOG extends IDialog>
             dividerContainer = (ViewGroup) itemView.findViewById(R.id.dialogDividerContainer);
             divider = itemView.findViewById(R.id.dialogDivider);
 
-            //新增
-            slidingMenu = itemView.findViewById(R.id.slidingMenu);
-            menuSetTop = itemView.findViewById(R.id.menuSetTop);
-            menuDelete = itemView.findViewById(R.id.menuDelete);
+            //新增(左右侧滑)
+            slidingMenu = itemView.findViewById(R.id.slidingMenu); //主布局
+            menuSetTop = itemView.findViewById(R.id.menuSetTop); //置顶
+            menuDelete = itemView.findViewById(R.id.menuDelete); //删除
+            //新增(徽章)
 
         }
 
@@ -615,7 +635,7 @@ public class DialogsListAdapter<DIALOG extends IDialog>
                 }
 
                 //Unread bubble
-                if (tvBubble != null) {
+                if (tvBubble != null && tvBubble.getClass().equals(TextView.class)) {
                     GradientDrawable bgShape = (GradientDrawable) tvBubble.getBackground();
                     bgShape.setColor(dialogStyle.getDialogUnreadBubbleBackgroundColor());
                     tvBubble.setVisibility(dialogStyle.isDialogDividerEnabled() ? VISIBLE : GONE);
@@ -672,7 +692,10 @@ public class DialogsListAdapter<DIALOG extends IDialog>
                 }
             }
         }
+        //添加改写
+        protected void setBadge(final DIALOG dialog){
 
+        }
 
         @Override
         public void onBind(final DIALOG dialog) {
@@ -719,9 +742,14 @@ public class DialogsListAdapter<DIALOG extends IDialog>
             }
 
             //Set Unread message count bubble
-            tvBubble.setText(String.valueOf(dialog.getUnreadCount()));
-            tvBubble.setVisibility(dialogStyle.isDialogUnreadBubbleEnabled() &&
-                    dialog.getUnreadCount() > 0 ? VISIBLE : GONE);
+            if(tvBubble != null && tvBubble.getClass().equals(TextView.class)){
+                tvBubble.setText(String.valueOf(dialog.getUnreadCount()));
+                tvBubble.setVisibility(dialogStyle.isDialogUnreadBubbleEnabled() &&
+                        dialog.getUnreadCount() > 0 ? VISIBLE : GONE);
+            }else {
+                setBadge(dialog);
+            }
+
 
             //触摸事件
             slidingMenu.setOnTouchListener(new View.OnTouchListener() {

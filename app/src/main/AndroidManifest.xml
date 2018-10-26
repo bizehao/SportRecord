@@ -26,7 +26,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.bzh.sportrecord.fileProvider"
@@ -55,7 +54,8 @@
         <activity
             android:name=".module.talk.talkFriends.FriendsActivity"
             android:launchMode="singleTop" />
-        <activity android:name=".module.home.ClipImageActivity"></activity>
+        <activity android:name=".module.home.ClipImageActivity" />
+        <activity android:name=".module.setting.SettingActivity"></activity>
     </application>
 
 </manifest>

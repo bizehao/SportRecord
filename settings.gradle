@@ -1,1 +1,1 @@
-include ':app', ':dialoglibrary', ':sofialibrary', ':chatkit'
+include ':app', ':sofialibrary', ':chatkit', ':compilerLib', ':annotationLib', ':apilibrary'

@@ -69,4 +69,8 @@ public interface RetrofitService {
     @POST("user/uploadPng")
     Observable<ResponseBody> uploadPng(@Part("username") RequestBody username,@Part MultipartBody.Part headPortrait);
 
+    //删除好友
+    @GET("user/deleteFriend")
+    Observable<ApiCommon> delFriend(@Query("username") String username,@Query("friendName") String friendName);
+
 }

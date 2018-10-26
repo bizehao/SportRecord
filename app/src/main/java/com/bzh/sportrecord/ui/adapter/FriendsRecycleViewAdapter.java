@@ -130,13 +130,13 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
             viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.setOnClickListener(v, friend);
+                    listener.setOnClickListener(v,i, friend);
                 }
             });
             viewHolder.linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    listener.setOnLongClickListener(v, friend);
+                    listener.setOnLongClickListener(v,i, friend);
                     return true;
                 }
             });
@@ -176,9 +176,9 @@ public class FriendsRecycleViewAdapter extends RecyclerView.Adapter<FriendsRecyc
     //事件接口
     public interface evenClickListener {
 
-        void setOnClickListener(View view, Friend friend);
+        void setOnClickListener(View view,int position, Friend friend);
 
-        void setOnLongClickListener(View view, Friend friend);
+        void setOnLongClickListener(View view,int position, Friend friend);
     }
 
     //排序

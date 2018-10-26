@@ -23,6 +23,9 @@ public interface MessageInfoDao {
     @Query("select * from messageinfo")
     LiveData<List<MessageInfo>> getAll();
 
+    @Query("select count(*) from messageinfo where readSign = :readSign")
+    LiveData<Integer> getNoReadCount(boolean readSign);
+
     @Query("select * from messageinfo")
     List<MessageInfo> loadAll();
 
@@ -47,6 +50,9 @@ public interface MessageInfoDao {
 
     @Update
     void update(List<MessageInfo> messageInfo);
+
+    @Query("update messageinfo set readSign = :readSign where sender = :friend")
+    void updateReadSign(String friend,boolean readSign);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(MessageInfo... messageInfo);

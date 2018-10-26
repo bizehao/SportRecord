@@ -1,5 +1,5 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@id/dialogRootLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -88,20 +88,22 @@
 
                 </RelativeLayout>
 
-                <TextView
+                <com.bzh.apilibrary.badge.BGABadgeTextView
                     android:id="@id/dialogUnreadBubble"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/dialogDate"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="24dp"
-                    android:layout_marginRight="24dp"
                     android:background="@drawable/bubble_circle"
                     android:ellipsize="end"
                     android:fontFamily="@string/font_fontFamily_medium"
                     android:gravity="center"
+                    app:badge_draggable="true"
+                    app:badge_padding="6dp"
+                    app:badge_horizontalMargin="0dp"
+                    app:badge_bgColor="@color/red"
                     android:lines="1" />
 
                 <FrameLayout

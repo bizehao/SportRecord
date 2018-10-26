@@ -3,9 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SportRecord.iml" filepath="$PROJECT_DIR$/SportRecord.iml" />
+      <module fileurl="file://$PROJECT_DIR$/annotationLib/annotationLib.iml" filepath="$PROJECT_DIR$/annotationLib/annotationLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apilibrary/apilibrary.iml" filepath="$PROJECT_DIR$/apilibrary/apilibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/chatkit/chatkit.iml" filepath="$PROJECT_DIR$/chatkit/chatkit.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dialoglibrary/dialoglibrary.iml" filepath="$PROJECT_DIR$/dialoglibrary/dialoglibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/compilerLib/compilerLib.iml" filepath="$PROJECT_DIR$/compilerLib/compilerLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/sofialibrary/sofialibrary.iml" filepath="$PROJECT_DIR$/sofialibrary/sofialibrary.iml" />
     </modules>
   </component>

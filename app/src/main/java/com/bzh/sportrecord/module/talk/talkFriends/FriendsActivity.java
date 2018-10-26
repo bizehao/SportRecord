@@ -14,14 +14,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.bzh.sportrecord.App;
+import com.bzh.sportrecord.MainActivity;
 import com.bzh.sportrecord.R;
+import com.bzh.sportrecord.api.RetrofitHelper;
 import com.bzh.sportrecord.base.activity.BaseActivity;
+import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.data.model.FriendsInfo;
+import com.bzh.sportrecord.model.ApiCommon;
 import com.bzh.sportrecord.model.Friend;
 import com.bzh.sportrecord.module.talk.model.User;
 import com.bzh.sportrecord.module.talk.talkMessage.MessageActivity;
 import com.bzh.sportrecord.ui.adapter.FriendsRecycleViewAdapter;
+import com.bzh.sportrecord.ui.widget.PopupList;
 import com.bzh.sportrecord.ui.widget.SideLetterBar;
 
 import java.util.ArrayList;
@@ -29,7 +37,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
+import io.reactivex.Observable;
 
 public class FriendsActivity extends BaseActivity {
 
@@ -44,9 +55,14 @@ public class FriendsActivity extends BaseActivity {
 
     @BindView(R.id.side_letter_bar)
     SideLetterBar sideLetterBar; //字母索引
+
+    @Inject
+    RetrofitHelper providerRetrofitHelper;
+
     FriendsRecycleViewAdapter adapter;
     FriendsViewModel friendsViewModel;
     List<FriendsInfo> newFriendsInfos = new ArrayList<>();
+    private List<String> popupMenuItemList = new ArrayList<>();
 
     @Override
     protected int getContentViewLayoutID() {
@@ -71,17 +87,55 @@ public class FriendsActivity extends BaseActivity {
             adapter.setFriends(friendsInfos);
             adapter.notifyDataSetChanged();
         });
-
         adapter = new FriendsRecycleViewAdapter(this, null);
+
+        popupMenuItemList.add("删除");
+
         adapter.setListener(new FriendsRecycleViewAdapter.evenClickListener() {
             @Override
-            public void setOnClickListener(View view, Friend friend) {
+            public void setOnClickListener(View view, int position, Friend friend) {
                 User user = new User(friend.getName(), friend.getRemarks(), friend.getImage(), true);
                 MessageActivity.open(FriendsActivity.this, user);//跳转到message
             }
+
             @Override
-            public void setOnLongClickListener(View view, Friend friend) {
-                showToast("暂时没思路");
+            public void setOnLongClickListener(View view, int position, Friend friend) {
+                int[] location = new int[2];
+                view.getLocationOnScreen(location);
+                PopupList popupList = new PopupList(view.getContext());
+                popupList.showPopupListWindow(view, position, location[0] + view.getWidth() / 2,
+                        location[1], popupMenuItemList, new PopupList.PopupListListener() {
+                            @Override
+                            public boolean showPopupList(View adapterView, View contextView, int contextPosition) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onPopupListClick(View contextView, int contextPosition, int position) {
+                                if (position == 0) {
+                                    FriendsInfo friendsInfo = AppDatabase.getAppDatabase().friendsInfoDao().findByUsername(friend.getName());
+                                    Observable<ApiCommon> observable = providerRetrofitHelper.getServer().delFriend(App.getUsername(), friend.getName());
+                                    providerRetrofitHelper.successHandler(observable, new RetrofitHelper.callBack() {
+                                        @Override
+                                        public <T> void run(T t) {
+                                            ApiCommon apiCommon = (ApiCommon) t;
+                                            if ((boolean) apiCommon.getData()) {
+                                                new MaterialDialog.Builder(FriendsActivity.this)
+                                                        .title("提示")
+                                                        .content("删除好友成功")
+                                                        .show();
+                                                AppDatabase.getAppDatabase().friendsInfoDao().delete(friendsInfo);
+                                            } else {
+                                                new MaterialDialog.Builder(FriendsActivity.this)
+                                                        .title("提示")
+                                                        .content("删除好友失败")
+                                                        .show();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
             }
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);

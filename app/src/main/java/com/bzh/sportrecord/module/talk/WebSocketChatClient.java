@@ -94,7 +94,6 @@ public class WebSocketChatClient extends WebSocketClient {
     @Override
     public void onClose(int code, String reason, boolean remote) {
         Log.d(TAG, "WebSocket关闭成功");
-        System.out.println("关闭哈哈");
         if (mainAttrs.getLoginSign().getValue() != null && mainAttrs.getLoginSign().getValue()) {
             System.out.println("执行重试连接");
             new Thread(this::reconnect).start();

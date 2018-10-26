@@ -1,0 +1,14 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //实现 AbstractProcessor
+    implementation 'com.google.auto.service:auto-service:1.0-rc4' //于自动为 JAVA Processor 生成 META-INF 信息
+    implementation 'com.squareup:javapoet:1.11.0' //生成代码
+    implementation 'com.google.auto:auto-common:0.10'
+    compile project(path: ':annotationLib')
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+

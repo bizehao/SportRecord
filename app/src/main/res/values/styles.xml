@@ -65,4 +65,24 @@
         <item name="android:windowExitAnimation">@anim/dialog_exit_anim</item>
     </style>
 
+    <style name="RbMainTab">
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <!-- 文字 -->
+    <style name="text">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <!-- 水波纹 -->
+    <style name="MyButton" parent="Theme.AppCompat.Light">
+        <item name="colorControlHighlight">@color/gray</item>
+        <item name="colorButtonNormal">@color/red</item>
+    </style>
+
 </resources>

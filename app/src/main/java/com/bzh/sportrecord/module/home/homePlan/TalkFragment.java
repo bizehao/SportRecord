@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,7 +26,6 @@ import com.bzh.sportrecord.base.fragment.BaseFragment;
 import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.data.model.FriendsInfo;
 import com.bzh.sportrecord.data.model.MessageInfo;
-import com.bzh.sportrecord.model.Talk;
 import com.bzh.sportrecord.module.login.LoginActivity;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
 import com.bzh.sportrecord.module.talk.model.Dialog;
@@ -43,8 +41,6 @@ import com.google.gson.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,10 +51,8 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class TalkFragment extends BaseFragment {
@@ -73,11 +67,14 @@ public class TalkFragment extends BaseFragment {
     Gson gson;
     @Inject
     MainAttrs mainAttrs;
+    @Inject
+    SharedPreferences sharedPreferences;
     private DialogsListAdapter<Dialog> dialogsAdapter;
     private ImageLoader imageLoader;
     private Bitmap mBitmap;
     private User receiver;
-    private Map<String, Dialog> dialogsMap = new LinkedHashMap<>();
+    private Map<String, Dialog> dialogsMap = new LinkedHashMap<>();//当前会话
+    Map<String, Dialog> temporaryDialogMap = new LinkedHashMap<>();//临时会话
     //存放当前用户的会话
     private TalkViewModel mTalkViewModel;
     private PageLayout mPageLayout;
@@ -116,40 +113,6 @@ public class TalkFragment extends BaseFragment {
         if (mPageLayout != null) {
             mPageLayout.hide();
         }
-        mTalkViewModel.getMessageInfos().observe(this, messageInfos -> {
-            if (messageInfos.size() > 0) {
-                for (int i = 0; i < messageInfos.size(); i++) {
-                    addDialog(messageInfos.get(i));
-                }
-            }
-        });
-        mTalkViewModel.getMessageInfoLiveData().observe(this, messageInfo -> {
-            addDialog(messageInfo);
-        });
-        mainAttrs.getClearZeroName().observe(this, s -> {
-            Dialog dialog = dialogsMap.get(s);
-            if (dialog != null && dialog.getUnreadCount() != 0) {
-                dialog.setUnreadCount(0);
-                dialogsAdapter.updateItemById(dialog);
-            }
-        });
-        mainAttrs.getOwnSendMsg().observe(this, messageInfo -> {
-            addDialogOfOwn(messageInfo);
-        });
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String dialogsMapJson = sharedPreferences.getString(App.getUsername(), null);
-        /*if (dialogsMapJson != null) {
-            //从本地读取列表信息
-            Gson gson = App.getGsonInstance();
-            dialogsMap = new LinkedHashMap<>();
-            JsonObject obj = new JsonParser().parse(dialogsMapJson).getAsJsonObject();
-            Set<Map.Entry<String, JsonElement>> entrySet = obj.entrySet();
-            for (Map.Entry<String, JsonElement> entry : entrySet) {
-                String entryKey = entry.getKey();
-                JsonObject value = (JsonObject) entry.getValue();
-                dialogsMap.put(entryKey, gson.fromJson(value, Dialog.class));
-            }
-        }*/
         imageLoader = new ImageLoader() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -164,7 +127,33 @@ public class TalkFragment extends BaseFragment {
                 }
             }
         };
-        dialogsAdapter = new DialogsListAdapter<>(R.layout.item_custom_dialog, imageLoader);
+        dialogsAdapter = new DialogsListAdapter<>(R.layout.item_custom_dialog, SubDialogViewHolder.class, imageLoader);
+        readData();
+        for (Map.Entry<String, Dialog> dialogEntry : dialogsMap.entrySet()) {
+            dialogEntry.getValue().setUnreadCount(0);
+            dialogsAdapter.addItem(dialogEntry.getValue());
+        }
+        mTalkViewModel.getMessageInfos().observe(this, messageInfos -> {
+            if (messageInfos.size() > 0) {
+                for (int i = 0; i < messageInfos.size(); i++) {
+                    addDialog(messageInfos.get(i));
+                }
+            }
+        });
+        mTalkViewModel.getMessageInfoLiveData().observe(this, messageInfo -> {
+            addDialog(messageInfo);
+        });
+        mainAttrs.getClearZeroName().observe(this, s -> { //进入对话界面，清空未读消息
+            Dialog dialog = dialogsMap.get(s);
+            if (dialog != null && dialog.getUnreadCount() != 0) {
+                dialog.setUnreadCount(0);
+                dialogsAdapter.updateItemById(dialog);
+                saveData(dialogsAdapter.getItems());
+            }
+        });
+        mainAttrs.getOwnSendMsg().observe(this, messageInfo -> {
+            addDialogOfOwn(messageInfo);
+        });
 
         dialogsAdapter.setOnDialogClickListener(new DialogsListAdapter.OnDialogClickListener<Dialog>() {
             @Override
@@ -184,27 +173,26 @@ public class TalkFragment extends BaseFragment {
             public void onSetTopClick(Dialog dialog) { //将某一项置顶
                 int position = dialogsAdapter.getDialogPosition(dialog);
                 dialogsAdapter.moveItem(position, 0);
+                saveData(dialogsAdapter.getItems());
             }
 
             @Override
             public void onDeleteClick(Dialog dialog) { //删除某一项
+                AppDatabase.getAppDatabase().messageInfoDao().updateReadSign(dialog.getUsers().get(0).getId(), true);
                 dialogsAdapter.deleteById(dialog.getId());
                 dialogsMap.remove(dialog.getUsers().get(0).getId());
+                saveData(dialogsAdapter.getItems());
             }
         });
-        //Collection<Dialog> dialogCollection = dialogsMap.values();
-        //dialogsAdapter.setItems(new ArrayList<>(dialogCollection));
+        dialogsAdapter.setDragDismissDelegate((Dialog dialog) -> { //拖动事件
+            AppDatabase.getAppDatabase().messageInfoDao().updateReadSign(dialog.getUsers().get(0).getId(), true);
+            dialog.setUnreadCount(0);
+            dialogsAdapter.updateItemById(dialog);
+            saveData(dialogsAdapter.getItems());
+        });
 
-        List<MessageInfo> messageInfos = new ArrayList<>();//mPlanPresenter.getMessageInfo();
-        if (messageInfos.size() > 0) {
-            for (int i = 0; i < messageInfos.size(); i++) {
-                MessageInfo messageInfo = messageInfos.get(i);
-                String id = Long.toString(UUID.randomUUID().getLeastSignificantBits());
-                //addDialog(id, messageInfo.getSender(), messageInfo.getMessage(), messageInfo.getTime(), false);
-            }
-        }
         dialogsList.setAdapter(dialogsAdapter);
-        App app = (App) getActivity().getApplication();
+
         webSocketChatClient.setDialogHandler(talk -> {
             mTalkViewModel.setMessageInfoLiveData(new MessageInfo(talk, false));
         });
@@ -226,7 +214,7 @@ public class TalkFragment extends BaseFragment {
         mPageLayout.showError();
     }
 
-    //添加会话多个
+    //添加会话他人发送
     @SuppressWarnings("CheckResult")
     public void addDialog(MessageInfo messageInfo) {
         if (!dialogsMap.containsKey(messageInfo.getSender())) {
@@ -250,6 +238,7 @@ public class TalkFragment extends BaseFragment {
                 dialogsAdapter.addItem(dialog);
                 int position = dialogsAdapter.getDialogPosition(dialog);
                 dialogsAdapter.moveItem(position, 0);
+                saveData(dialogsAdapter.getItems());
             });
         } else {
             Observable.create((ObservableOnSubscribe<Dialog>) emitter -> {
@@ -267,6 +256,7 @@ public class TalkFragment extends BaseFragment {
                 dialogsAdapter.updateItemById(dialog);
                 int position = dialogsAdapter.getDialogPosition(dialog);
                 dialogsAdapter.moveItem(position, 0);
+                saveData(dialogsAdapter.getItems());
             });
         }
     }
@@ -283,13 +273,13 @@ public class TalkFragment extends BaseFragment {
                 users.add(receiver);
                 Message message = new Message(messageInfo.getId().toString(), receiver, messageInfo.getMessage(), messageInfo.getTime());
                 Dialog dialog = new Dialog(id, receiver.getName(), receiver.getAvatar(), users, message, 0);
-                ;
                 dialogsMap.put(friendsInfo.getUsername(), dialog);
                 emitter.onNext(dialog);
             }).observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribe(dialog -> {
                 dialogsAdapter.addItem(dialog);
                 int position = dialogsAdapter.getDialogPosition(dialog);
                 dialogsAdapter.moveItem(position, 0);
+                saveData(dialogsAdapter.getItems());
             });
         } else {
             Observable.create((ObservableOnSubscribe<Dialog>) emitter -> {
@@ -303,36 +293,40 @@ public class TalkFragment extends BaseFragment {
                 dialogsAdapter.updateItemById(dialog);
                 int position = dialogsAdapter.getDialogPosition(dialog);
                 dialogsAdapter.moveItem(position, 0);
+                dialogsAdapter.getItems();
+                saveData(dialogsAdapter.getItems());
             });
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        saveData();
     }
 
     /**
      * 保存临时数据
      */
-    private void saveData() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+    private void saveData(List<Dialog> dialogs) {
+        temporaryDialogMap.clear();
         SharedPreferences.Editor edit = sharedPreferences.edit();
-        List<Dialog> dialogs = dialogsAdapter.getItems();
-        Map<String, Dialog> dialogMap = new LinkedHashMap<>();
         for (Dialog dialog : dialogs) {
-            dialogMap.put(dialog.getUsers().get(0).getId(), dialog);
+            temporaryDialogMap.put(dialog.getUsers().get(0).getId(), dialog);
         }
-        String dialogsMapJson = gson.toJson(dialogMap);
+        String dialogsMapJson = gson.toJson(temporaryDialogMap);
         edit.putString(App.getUsername(), dialogsMapJson);
         edit.apply();
     }
 
-
+    /**
+     * 保存临时数据 取出
+     */
+    private void readData() {
+        String dialogsMapJson = sharedPreferences.getString(App.getUsername(), null);
+        if (dialogsMapJson != null) {
+            //从本地读取列表信息
+            JsonObject obj = new JsonParser().parse(dialogsMapJson).getAsJsonObject();
+            Set<Map.Entry<String, JsonElement>> entrySet = obj.entrySet();
+            for (Map.Entry<String, JsonElement> entry : entrySet) {
+                String entryKey = entry.getKey();
+                JsonObject value = (JsonObject) entry.getValue();
+                dialogsMap.put(entryKey, gson.fromJson(value, Dialog.class));
+            }
+        }
+    }
 }

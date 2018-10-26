@@ -1,6 +1,8 @@
 package com.bzh.sportrecord.api;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.bzh.sportrecord.App;
 import com.bzh.sportrecord.MainAttrs;
@@ -63,13 +65,11 @@ public class RetrofitHelper {
             Request original = chain.request();
             Request request;
             if (mainAttrs.getLoginSign().getValue() != null && mainAttrs.getLoginSign().getValue()) {
-                System.out.println("已经走了======");
                 request = original.newBuilder()
                         .header("X_Auth_Token", App.getToken())
                         .method(original.method(), original.body())
                         .build();
             } else {
-                System.out.println("没有走======");
                 request = original.newBuilder()
                         .method(original.method(), original.body())
                         .build();

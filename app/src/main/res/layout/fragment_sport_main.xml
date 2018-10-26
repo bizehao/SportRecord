@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/fsm"
+        android:layout_margin="20dp"
+        app:cardBackgroundColor="@color/blue"
+        app:cardCornerRadius="10dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="4dp"
+                android:text="你的最高记录：58"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_20sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="80dp"
+                android:background="@drawable/card_2">
+
+                <TextView
+                    android:id="@+id/fsm_xunlian"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:text="训练"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_20sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@+id/fsm_qianzi"
+                    android:text="4"
+                    android:layout_alignBaseline="@id/fsm_qianzi"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_22sp" />
+
+                <TextView
+                    android:id="@+id/fsm_qianzi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:text="/19"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_14sp" />
+
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <TableLayout
+        android:id="@+id/fsm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/fsm_buts"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/card_1">
+
+        <TableRow
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:text="下次训练"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="end"
+                android:text="明天"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_18sp" />
+
+            <ImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="5dp"
+                android:background="@color/colorPrimary"
+                android:src="@mipmap/menu_carte" />
+        </TableRow>
+
+        <TableRow android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:text="组"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="end"
+                android:text="22-12-18-22-12"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_18sp" />
+        </TableRow>
+
+        <TableRow android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:text="总共"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="end"
+                android:text="76"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_18sp" />
+        </TableRow>
+
+    </TableLayout>
+
+    <LinearLayout
+        android:id="@+id/fsm_buts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
+
+        <Button
+            style="@style/MyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/water_ripple"
+            android:text="开始训练"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_16sp" />
+
+        <Button
+            style="@style/MyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/water_ripple"
+            android:text="环节/记录"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_16sp" />
+    </LinearLayout>
+
+
+</RelativeLayout>

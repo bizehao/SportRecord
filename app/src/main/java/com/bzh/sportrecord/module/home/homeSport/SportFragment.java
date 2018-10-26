@@ -1,87 +1,77 @@
 package com.bzh.sportrecord.module.home.homeSport;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+
 import com.bzh.sportrecord.R;
 import com.bzh.sportrecord.base.fragment.BaseFragment;
-import com.bzh.sportrecord.data.AppDatabase;
-import com.bzh.sportrecord.data.model.FriendsInfo;
-import com.bzh.sportrecord.module.home.HomeViewModel;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.OnClick;
-import timber.log.Timber;
 
 public class SportFragment extends BaseFragment {
 
-    @BindView(R.id.ws_edittext)
-    EditText editText;
+    @BindView(R.id.sport_tab)
+    TabLayout mTabLayout;
 
-    @BindView(R.id.ws_button)
-    Button button;
+    @BindView(R.id.sport_pager)
+    ViewPager mViewPager;
 
-    @BindView(R.id.ws_textview)
-    TextView textView;
+    @Inject
+    public SportCensusFragment censusFragment;
 
-    private HomeViewModel mHomeViewModel;
+    @Inject
+    public SportMainFragment mainFragment;
+
+    @Inject
+    public SportRatioFragment ratioFragment;
+
+    private Fragment[] fragments = new Fragment[3];
+    private String[] fragmentNames = new String[3];
 
     @Inject
     public SportFragment() {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mHomeViewModel = ViewModelProviders.of(getActivity()).get(HomeViewModel.class);
-
-        mHomeViewModel.getmCurrentName().observe(this, s -> {
-            System.out.println(s);
-            textView.setText(s);
-            Timber.d(s);
-        });
-
-    }
-
-    @Override
     protected int getContentViewLayoutID() {
-        return R.layout.test;
+        return R.layout.fragment_sport;
     }
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        editText.addTextChangedListener(new TextWatcher() {
+        fragments[0] = censusFragment;
+        fragments[1] = mainFragment;
+        fragments[2] = ratioFragment;
+        fragmentNames[0] = "统计";
+        fragmentNames[1] = "主页";
+        fragmentNames[2] = "排行榜";
+        FragmentManager manager = getChildFragmentManager();
+        mViewPager.setAdapter(new FragmentPagerAdapter(manager) {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public Fragment getItem(int i) {
+                return fragments[i];
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public int getCount() {
+                return fragments.length;
             }
 
+            @Nullable
             @Override
-            public void afterTextChanged(Editable s) {
-                mHomeViewModel.setmCurrentName(s.toString());
+            public CharSequence getPageTitle(int position) {
+                return fragmentNames[position];
             }
         });
-    }
-
-    @OnClick(R.id.ws_button)
-    public void buttonClick() {
-        List<FriendsInfo> as =  AppDatabase.getAppDatabase().friendsInfoDao().loadAll();
-        AppDatabase.getAppDatabase().friendsInfoDao().delete(as);
-        List<FriendsInfo> bs =  AppDatabase.getAppDatabase().friendsInfoDao().loadAll();
-        System.out.println("剩余");
-        System.out.println(bs.size());
+        mViewPager.setCurrentItem(1);
+        mTabLayout.setupWithViewPager(mViewPager);
     }
 
 }

@@ -5,7 +5,7 @@
             <!--边框角度--> 
             <corners android:radius="10dip" />
             <!--外边框颜色--> 
-            <solid android:color="@color/actionsheet_blue" />
+            <solid android:color="#0911e6" />
         </shape>
     </item>
     <!--离边框的厚度-->

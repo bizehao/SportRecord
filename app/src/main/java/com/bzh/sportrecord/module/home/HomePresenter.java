@@ -17,6 +17,8 @@ import com.bzh.sportrecord.model.ApiUserInfo;
 import com.bzh.sportrecord.module.login.LoginActivity;
 import com.bzh.sportrecord.module.talk.WebSocketChatClient;
 
+import org.java_websocket.WebSocket;
+
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -61,7 +63,13 @@ public class HomePresenter implements HomeContract.Presenter {
                 mView.setHeadPortrait(bitMap);
                 mView.setHeadName(apiUserInfo.getData().getName());
                 mView.setHeadMotto(apiUserInfo.getData().getMotto());
-                webSocketChatClient.connect(); //连接 webSocket;
+                //webSocketChatClient.connectBlocking()
+                //webSocketChatClient.reconnect();
+                if(webSocketChatClient.getReadyState() == WebSocket.READYSTATE.NOT_YET_CONNECTED){
+                    webSocketChatClient.connect(); //连接
+                }else {
+                    webSocketChatClient.reconnect(); //恢复连接
+                }
             }
         });
         Observable<ApiFriends> friends = retrofitHelper.getServer().getFriends(username);
