@@ -60,4 +60,9 @@
         <!-- 触发开始拖拽徽章事件的扩展触摸距离 -->
         <attr name="badge_dragExtra" format="reference|dimension" />
     </declare-styleable>
+
+    <!-- 自定义圆 -->
+    <declare-styleable name="CircleView">
+        <attr name="circle_color" format="color"/>
+    </declare-styleable>
 </resources>

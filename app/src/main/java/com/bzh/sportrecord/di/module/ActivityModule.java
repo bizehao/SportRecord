@@ -4,6 +4,7 @@ import com.bzh.sportrecord.MainActivity;
 import com.bzh.sportrecord.di.module.TwoGrade.FriendsModule;
 import com.bzh.sportrecord.di.module.TwoGrade.HomeModule;
 import com.bzh.sportrecord.di.module.TwoGrade.LoginModule;
+import com.bzh.sportrecord.module.doing.DoActivity;
 import com.bzh.sportrecord.module.home.HomeActivity;
 import com.bzh.sportrecord.module.login.LoginActivity;
 import com.bzh.sportrecord.module.setting.SettingActivity;
@@ -34,4 +35,7 @@ public abstract class ActivityModule {
 
     @ContributesAndroidInjector
     abstract SettingActivity providesSettingActivity();
+
+    @ContributesAndroidInjector
+    abstract DoActivity providesDoActivity();
 }

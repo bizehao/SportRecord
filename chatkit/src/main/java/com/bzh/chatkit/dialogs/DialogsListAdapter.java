@@ -780,7 +780,6 @@ public class DialogsListAdapter<DIALOG extends IDialog>
                                         }
                                     }
                                 }
-                                return false;
                             }
                             if (System.currentTimeMillis() - slidingMenu.downTime > 200 && scrollX == 0) { //长按事件
                                 if(!slidingMenu.carriedOut){
@@ -795,9 +794,9 @@ public class DialogsListAdapter<DIALOG extends IDialog>
                                         }
                                     }
                                 }
-                                return onLongItemClickListener != null || onDialogViewLongClickListener != null;
+                                //return onLongItemClickListener != null || onDialogViewLongClickListener != null;
                             }
-                            if (Math.abs(scrollX) > slidingMenu.mMenuWidth) {
+                            if (Math.abs(scrollX) > slidingMenu.mMenuWidth) { //打开
                                 if(slidingMenu.isOpen()){
                                     slidingMenu.closeMenu();
                                 }else {

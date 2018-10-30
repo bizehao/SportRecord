@@ -55,7 +55,8 @@
             android:name=".module.talk.talkFriends.FriendsActivity"
             android:launchMode="singleTop" />
         <activity android:name=".module.home.ClipImageActivity" />
-        <activity android:name=".module.setting.SettingActivity"></activity>
+        <activity android:name=".module.setting.SettingActivity" />
+        <activity android:name=".module.doing.DoActivity"></activity>
     </application>
 
 </manifest>

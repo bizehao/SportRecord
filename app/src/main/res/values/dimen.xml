@@ -29,4 +29,19 @@
     <dimen name="font_34sp">34sp</dimen>
     <dimen name="font_35sp">35sp</dimen>
     <dimen name="font_36sp">36sp</dimen>
+    <dimen name="font_37sp">37sp</dimen>
+    <dimen name="font_38sp">38sp</dimen>
+    <dimen name="font_39sp">39sp</dimen>
+    <dimen name="font_40sp">40sp</dimen>
+    <dimen name="font_41sp">41sp</dimen>
+    <dimen name="font_42sp">42sp</dimen>
+    <dimen name="font_43sp">43sp</dimen>
+    <dimen name="font_44sp">44sp</dimen>
+    <dimen name="font_45sp">45sp</dimen>
+    <dimen name="font_55sp">55sp</dimen>
+    <dimen name="font_65sp">65sp</dimen>
+    <dimen name="font_75sp">75sp</dimen>
+    <dimen name="font_85sp">85sp</dimen>
+    <dimen name="font_95sp">95sp</dimen>
+    <dimen name="font_100sp">100sp</dimen>
 </resources>

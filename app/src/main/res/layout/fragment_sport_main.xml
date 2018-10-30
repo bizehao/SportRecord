@@ -4,73 +4,167 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/fsm"
         android:layout_margin="20dp"
-        app:cardBackgroundColor="@color/blue"
-        app:cardCornerRadius="10dp">
+        android:background="@drawable/card_3">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="4dp"
+            android:text="你的最高记录：58"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_20sp" />
 
         <RelativeLayout
+            android:id="@+id/fsm_cardShow"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="80dp"
+            android:background="@drawable/card_2">
+
+            <TextView
+                android:id="@+id/fsm_xunlian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:text="训练"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_20sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="4dp"
-                android:text="你的最高记录：58"
+                android:layout_alignBaseline="@id/fsm_qianzi"
+                android:layout_marginTop="5dp"
+                android:layout_toStartOf="@+id/fsm_qianzi"
+                android:text="4"
                 android:textColor="@color/white"
-                android:textSize="@dimen/font_20sp" />
+                android:textSize="@dimen/font_22sp" />
 
-            <RelativeLayout
+            <TextView
+                android:id="@+id/fsm_qianzi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="/19"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_14sp" />
+
+            <com.bzh.sportrecord.ui.widget.LineView
+                android:id="@+id/fsm_lv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="80dp"
-                android:background="@drawable/card_2">
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="@color/red" />
 
-                <TextView
-                    android:id="@+id/fsm_xunlian"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:text="训练"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/font_20sp" />
+            <TextView
+                android:id="@+id/fsm_dateTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fsm_lv"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:text="最近一次的日期:"
+                android:textColor="@color/white" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toStartOf="@+id/fsm_qianzi"
-                    android:text="4"
-                    android:layout_alignBaseline="@id/fsm_qianzi"
-                    android:layout_marginTop="5dp"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/font_22sp" />
-
-                <TextView
-                    android:id="@+id/fsm_qianzi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:text="/19"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/font_14sp" />
-
-
-            </RelativeLayout>
+            <TextView
+                android:id="@+id/fsm_dateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fsm_lv"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:text="2018-10-29 22:35"
+                android:textColor="@color/white" />
 
         </RelativeLayout>
 
-    </android.support.v7.widget.CardView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="已完成"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="还剩余"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="距目标时间"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="58个"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="90个"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="896天"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <TableLayout
         android:id="@+id/fsm"
@@ -169,6 +263,7 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/fsm_begin"
             style="@style/MyButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

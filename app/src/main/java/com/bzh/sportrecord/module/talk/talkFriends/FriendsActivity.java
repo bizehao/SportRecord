@@ -75,9 +75,7 @@ public class FriendsActivity extends BaseActivity {
         mToolbar.setTitle("我的联系人");
         mToolbar.setOverflowIcon(ContextCompat.getDrawable(this, R.mipmap.menu_add));
         setSupportActionBar(mToolbar);
-        if (mToolbar != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         friendsViewModel = ViewModelProviders.of(this).get(FriendsViewModel.class);
         friendsViewModel.getFriends().observe(this, friendsInfos -> {
             adapter.setFriends(friendsInfos);
