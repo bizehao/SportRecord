@@ -15,7 +15,9 @@ import com.bzh.apilibrary.badge.BGABadgeable;
 import com.bzh.apilibrary.badge.BGADragDismissDelegate;
 import com.bzh.sportrecord.module.home.HomeActivity;
 import com.bzh.sportrecord.ui.widget.PopupList;
+import com.bzh.sportrecord.utils.AppManager;
 import com.bzh.sportrecord.utils.ToastUtil;
+import com.idescout.sql.SqlScoutServer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FancyButton fancyButton;
 
+    private SqlScoutServer sqlScoutServer;
     private BGABadgeTextView bgaBadgeTextView;
     private List<String> popupMenuItemList = new ArrayList<>();
     @Override
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ToastUtil.init(this);
+        sqlScoutServer = SqlScoutServer.create(this, getPackageName());
         fancyButton = findViewById(R.id.btn_spotify);
         bgaBadgeTextView = findViewById(R.id.bgabadgetextview);
         PopupList popupList = new PopupList(this);
@@ -73,9 +77,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         startActivity(new Intent(MainActivity.this, HomeActivity.class));
+        //AppManager.getAppManager().finishActivity();
+        finish();
     }
 
     public void show() {
 
     }
+
+    @Override
+    protected void onResume() {
+        sqlScoutServer.resume();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        sqlScoutServer.destroy();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        sqlScoutServer.destroy();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        sqlScoutServer.destroy();
+        super.onDestroy();
+    }
+
 }

@@ -1,14 +1,19 @@
 package com.bzh.sportrecord;
 
+import android.app.Activity;
+import android.os.Bundle;
+
 import com.bzh.sportrecord.data.AppDatabase;
 import com.bzh.sportrecord.di.component.DaggerAppComponent;
+import com.bzh.sportrecord.module.talk.model.User;
+
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
 import timber.log.Timber;
 
 public class App extends DaggerApplication {
 
-    public static final String ip = "192.168.1.196";//172.26.220.193  192.168.31.75  192.168.1.196
+    public static final String ip = "192.168.1.199";//172.26.220.193  192.168.31.75  192.168.1.196
 
     //用户
     private static User user;
@@ -27,7 +32,6 @@ public class App extends DaggerApplication {
         user = new User();
 
         AppDatabase.initAppDatabase(this); //初始化数据库
-
     }
 
     //设置当前会话的朋友

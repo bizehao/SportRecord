@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: android.arch.paging:rxjava2:1.0.1@aar">
+    <CLASSES>
+      <root url="file://D:/.gradle/caches/transforms-1/files-1.1/rxjava2-1.0.1.aar/43566252e142dad8fb1c7ab2dbbf9f86/res" />
+      <root url="jar://D:/.gradle/caches/transforms-1/files-1.1/rxjava2-1.0.1.aar/43566252e142dad8fb1c7ab2dbbf9f86/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://D:/.gradle/caches/modules-2/files-2.1/android.arch.paging/rxjava2/1.0.1/ad633dd0204b0e2ceeb797837b635d1918f31974/rxjava2-1.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
